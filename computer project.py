@@ -6,6 +6,7 @@ try:
     host="sql6.freemysqlhosting.net",
     user="sql6409553",
     password="kn7MhCQugW",
+    database='sql6409553' 
     )
     print('yeet')
 
@@ -16,3 +17,8 @@ except mysql.connector.Error as err:
         print("Database does not exist")
     else:
         print(err)
+
+
+cursor = cnx.cursor().execute('insert into user_data(username, crypto , money) values ("yeet", 0 , 0)')
+cnx.commit()
+cnx.close()
