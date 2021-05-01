@@ -3,9 +3,9 @@ from mysql.connector import errorcode
 
 try:
     cnx = mysql.connector.connect(
-    host="127.0.0.1",
-    user="root",
-    password="1234"
+    host="sql6.freemysqlhosting.net",
+    user="sql6409553",
+    password="kn7MhCQugW",
     )
     print('yeet')
 
