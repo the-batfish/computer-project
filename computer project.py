@@ -6,8 +6,8 @@ try:
     host="sql6.freemysqlhosting.net",
     user="sql6409553",
     password="kn7MhCQugW",
+    database= "sql6409553",
     )
-    print('yeet')
 
 except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
