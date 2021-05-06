@@ -19,6 +19,3 @@ except mysql.connector.Error as err:
         print(err)
 
 
-cursor = cnx.cursor().execute('insert into user_data(username, crypto , money) values ("yeet", 0 , 0)')
-cnx.commit()
-cnx.close()
