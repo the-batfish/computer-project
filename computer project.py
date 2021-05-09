@@ -3,10 +3,10 @@ from mysql.connector import errorcode
 
 try:
     cnx = mysql.connector.connect(
-    host="sql6.freemysqlhosting.net",
-    user="sql6409553",
-    password="kn7MhCQugW",
-    database='sql6409553' 
+    host="localhost",
+    user="root",
+    password="1234",
+    database='computerscienceprojectdb' 
     )
     print('yeet')
 
