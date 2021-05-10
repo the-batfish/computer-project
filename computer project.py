@@ -18,4 +18,11 @@ except mysql.connector.Error as err:
     else:
         print(err)
 
+#this function is for first time use
+def add_account(user_id,username,password):
+    cursor = cnx.cursor().execute('INSERT INTO economy_data(user_id , username , password , crypto , money) VALUES (%s , %s , %s , 0 , 0)' , (user_id , username , password))
+    cnx.commit()
+    cnx.close()
+
+
 
