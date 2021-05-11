@@ -3,10 +3,10 @@ from mysql.connector import errorcode
 
 try:
     cnx = mysql.connector.connect(
-    host="sql6.freemysqlhosting.net",
-    user="sql6409553",
-    password="kn7MhCQugW",
-    database='sql6409553' 
+    host="localhost",
+    user="root",
+    password="1234",
+    database='computerscienceprojectdb' 
     )
 
 except mysql.connector.Error as err:
@@ -17,7 +17,11 @@ except mysql.connector.Error as err:
     else:
         print(err)
 
+#this function is for first time use
+def add_account(user_id,username,password):
+    cursor = cnx.cursor().execute('INSERT INTO economy_data(user_id , username , password , crypto , money) VALUES (%s , %s , %s , 0 , 0)' , (user_id , username , password))
+    cnx.commit()
+    cnx.close()
 
-cursor = cnx.cursor().execute('insert into user_data(username, crypto , money) values ("yeet", 0 , 0)')
-cnx.commit()
-cnx.close()
+#my name yeet
+
