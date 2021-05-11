@@ -3,12 +3,13 @@ from mysql.connector import errorcode
 
 try:
     cnx = mysql.connector.connect(
-    host="sql6.freemysqlhosting.net",
-    user="sql6409553",
-    password="kn7MhCQugW",
-    database='sql6409553' 
+    host="localhost",
+    user="root",
+    password="1234",
+    database='computerscienceprojectdb' 
     )
-    print('yeet')
+
+
 
 except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -18,7 +19,44 @@ except mysql.connector.Error as err:
     else:
         print(err)
 
+cursor = cnx.cursor()
 
-cursor = cnx.cursor().execute('insert into user_data(username, crypto , money) values ("yeet", 0 , 0)')
-cnx.commit()
-cnx.close()
+#this function is for first time use
+def add_account(user_id,username,password):
+    cursor.execute('INSERT INTO economy_data(user_id , username , password , crypto , money) VALUES (%s , %s , %s , 0 , 0)' , (user_id , username , password))
+    cnx.commit()
+    cnx.close()
+    print('Account has been succesfully created!')
+
+#this function is for displaying the current and previous exchange rates
+def show_exchange_rate():    
+    cursor.execute('SELECT current_exchange_rate , prev_exchange_rate FROM exchange_rate')
+    results = cursor.fetchone()
+    print('The current exchange rate is',results[0],'$ per crypto')
+    print('The previous exchange rate was',results[1],'$ per crypto')
+
+#this function is for obtaining the current exchange rate for buying and selling
+def exchange_rate():
+    cursor.execute('SELECT current_exchange_rate FROM exchange_rate')
+    return cursor.fetchone()[0]
+
+#this function is for buying crypto
+def buy_crypto(num , username): #here num is the number of cryptos being requested to buy
+    exch = exchange_rate()
+    cost = num * exch
+    cursor.execute("SELECT crypto , money FROM economy_data WHERE username = '%s'",username)
+    available_crypto = cursor.fetchone()[0]
+    available_money = cursor.fetchone()[1]
+    if cost <= available_money:
+        new_balance = available_money - cost
+        new_crypto_balance = available_crypto + num
+        command = "UPDATE economy_data SET 'crypto' = '%s' , 'money' = '%s' WHERE username = '%s'"
+        values =  (new_crypto_balance , new_balance , username)
+        cursor.execute(command, values)
+        cnx.commit()
+        cnx.close()
+        print('Transaction was completely successful')
+        print(num,' cryptos have been added to your account')
+    else:
+        print('Sorry transaction was unsuccessful due to limited funds')
+buy_crypto(5 , 'test')
