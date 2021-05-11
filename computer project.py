@@ -8,7 +8,6 @@ try:
     password="1234",
     database='computerscienceprojectdb' 
     )
-    print('yeet')
 
 
 
