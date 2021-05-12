@@ -44,13 +44,15 @@ def exchange_rate():
 def buy_crypto(num , username): #here num is the number of cryptos being requested to buy
     exch = exchange_rate()
     cost = num * exch
-    cursor.execute("SELECT crypto , money FROM economy_data WHERE username = '%s'",username)
-    available_crypto = cursor.fetchone()[0]
-    available_money = cursor.fetchone()[1]
+    query = "SELECT crypto, money FROM economy_data WHERE username = %s" 
+    cursor.execute(query,(username,)) 
+    values = cursor.fetchone()
+    available_crypto = values[0]
+    available_money = values[1]
     if cost <= available_money:
         new_balance = available_money - cost
         new_crypto_balance = available_crypto + num
-        command = "UPDATE economy_data SET 'crypto' = '%s' , 'money' = '%s' WHERE username = '%s'"
+        command = "UPDATE economy_data SET crypto = %s , money = %s WHERE username = %s"
         values =  (new_crypto_balance , new_balance , username)
         cursor.execute(command, values)
         cnx.commit()
@@ -59,4 +61,25 @@ def buy_crypto(num , username): #here num is the number of cryptos being request
         print(num,' cryptos have been added to your account')
     else:
         print('Sorry transaction was unsuccessful due to limited funds')
-buy_crypto(5 , 'test')
+
+#this function is for buying crypto
+def sell_crypto(num , username): #here num is the number of cryptos being sold
+    exch = exchange_rate()
+    sale = num * exch
+    query = "SELECT crypto, money FROM economy_data WHERE username = %s" 
+    cursor.execute(query,(username,)) 
+    values = cursor.fetchone()
+    available_crypto = values[0]
+    available_money = values[1]
+    if num <= available_crypto:
+        new_balance = available_money + sale
+        new_crypto_balance = available_crypto - num
+        command = "UPDATE economy_data SET crypto = %s , money = %s WHERE username = %s"
+        values =  (new_crypto_balance , new_balance , username)
+        cursor.execute(command, values)
+        cnx.commit()
+        cnx.close()
+        print('Transaction was completely successful')
+        print(sale,'$ have been added to your account')
+    else:
+        print('Sorry transaction was unsuccessful due to limited funds')
