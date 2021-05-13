@@ -35,6 +35,14 @@ def show_exchange_rate():
     print('The current exchange rate is',results[0],'$ per crypto')
     print('The previous exchange rate was',results[1],'$ per crypto')
 
+#this function is for showing the balance in your account
+def balance(username):
+    query = "SELECT crypto, money FROM economy_data WHERE username = %s" 
+    cursor.execute(query,(username,))
+    results = cursor.fetchone()
+    print('You have',results[0],'cryptos in your account')
+    print('You have',results[1],'$ in your account')
+
 #this function is for obtaining the current exchange rate for buying and selling
 def exchange_rate():
     cursor.execute('SELECT current_exchange_rate FROM exchange_rate')
@@ -58,7 +66,7 @@ def buy_crypto(num , username): #here num is the number of cryptos being request
         cnx.commit()
         cnx.close()
         print('Transaction was completely successful')
-        print(num,' cryptos have been added to your account')
+        print(num,'cryptos have been added to your account')
     else:
         print('Sorry transaction was unsuccessful due to limited funds')
 
@@ -80,6 +88,6 @@ def sell_crypto(num , username): #here num is the number of cryptos being sold
         cnx.commit()
         cnx.close()
         print('Transaction was completely successful')
-        print(sale,'$ have been added to your account')
+        print(sale.strip,'$ have been added to your account')
     else:
         print('Sorry transaction was unsuccessful due to limited funds')
