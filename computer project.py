@@ -88,6 +88,38 @@ def sell_crypto(num , username): #here num is the number of cryptos being sold
         cnx.commit()
         cnx.close()
         print('Transaction was completely successful')
-        print(sale.strip,'$ have been added to your account')
+        print(sale,'$ have been added to your account')
     else:
         print('Sorry transaction was unsuccessful due to limited funds')
+
+def exch_r8_refresh():
+    query1 = "SELECT current_exchange_rate , prev_exchange_rate FROM exchange_rate" 
+    cursor.execute(query1)
+    curr_exch_r8 = cursor.fetchone()[0]
+
+    query2 = "SELECT crypto FROM economy_data" 
+    cursor.execute(query2)
+    n1 = 0
+    tot_crypto = 0
+    for i in cursor.fetchall():
+        tot_crypto += i[0]
+        n1 += 1
+    avg_crypto = tot_crypto/n1
+
+    query3 = "SELECT money FROM economy_data" 
+    cursor.execute(query3)
+    n2 = 0
+    tot_money = 0
+    for i in cursor.fetchall():
+        tot_money += i[0]
+        n2 += 1
+    avg_money = tot_money/n2
+    
+    ratio = avg_crypto/avg_money
+    new_exch_r8 = round(curr_exch_r8*ratio)
+
+    command = "UPDATE exchange_rate SET current_exchange_rate = %s , prev_exchange_rate = %s"
+    values =  (new_exch_r8 , curr_exch_r8)
+    cursor.execute(command, values)
+    cnx.commit()
+    cnx.close()
