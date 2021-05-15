@@ -23,10 +23,13 @@ cursor = cnx.cursor()
 
 #this function is for first time use
 def add_account(user_id,username,password):
-    cursor.execute('INSERT INTO economy_data(user_id , username , password , crypto , money) VALUES (%s , %s , %s , 0 , 0)' , (user_id , username , password))
-    cnx.commit()
-    cnx.close()
-    print('Account has been succesfully created!')
+    try: 
+        cursor.execute('INSERT INTO economy_data(user_id , username , password , crypto , money) VALUES (%s , %s , %s , 0 , 0)' , (user_id , username , password))
+        cnx.commit()
+        cnx.close()
+        print('Account has been succesfully created!')
+    except:
+        print('Account with the same username already exists')
 
 #this function is for displaying the current and previous exchange rates
 def show_exchange_rate():    
