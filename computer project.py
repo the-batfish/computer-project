@@ -116,7 +116,10 @@ def exch_r8_refresh():
     avg_money = tot_money/n2
     
     ratio = avg_crypto/avg_money
-    new_exch_r8 = round(curr_exch_r8*ratio)
+    if round(curr_exch_r8*ratio) >= 1: 
+        new_exch_r8 = round(curr_exch_r8*ratio)
+    else:
+        new_exch_r8 = 1
 
     command = "UPDATE exchange_rate SET current_exchange_rate = %s , prev_exchange_rate = %s"
     values =  (new_exch_r8 , curr_exch_r8)
