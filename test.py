@@ -26,7 +26,7 @@ def something():
 	query = "INSERT INTO exchange_rate(next_reset) VALUES('%s') "
 	value = datetime.datetime(2021,5,17,19,45,0).strftime('%Y-%m-%d %H:%M:%S')
 	print(value)
-	cursor.execute(query,(str(value),))
+	cursor.execute("INSERT INTO exchange_rate (current_exchange_rate,prev_exchange_rate,next_reset) VALUES (5,1,%s)",(value,))
 	cnx.commit()
 	cnx.close()
 something()

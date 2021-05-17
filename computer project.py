@@ -4,10 +4,10 @@ import datetime
 
 try:
     cnx = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="1234",
-    database='computerscienceprojectdb' 
+    host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
+    user="uf7gxtzihchkojup",
+    password="K1bhziQq9KnSPAVSnFdH",
+    database='blsuvxgq3bvwh8qw4ah7' 
     )
 
 
