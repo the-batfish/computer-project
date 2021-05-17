@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import errorcode
+import datetime
 
 try:
     cnx = mysql.connector.connect(
@@ -129,3 +130,4 @@ def exch_r8_refresh():
     cursor.execute(command, values)
     cnx.commit()
     cnx.close()
+
