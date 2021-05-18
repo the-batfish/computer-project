@@ -25,23 +25,24 @@ cursor = cnx.cursor()
 
 def something():
 	query = "INSERT INTO exchange_rate(next_reset) VALUES('%s') "
-	value = datetime.datetime(2021,5,18,8,15,30).strftime('%Y-%m-%d %H:%M:%S')
-	print(value)
+	value = datetime.datetime(2021,5,18,8,54,30).strftime('%Y-%m-%d %H:%M:%S')
 	cursor.execute("update exchange_rate SET next_reset = %s",(value,))
 	cnx.commit()
 	cnx.close()
 something()
 
-while True:
+def recur():
     cursor.execute("select next_reset from exchange_rate")
     dt = datetime.datetime.strptime(cursor.fetchone()[0], '%Y-%m-%d %H:%M:%S')
     if datetime.datetime.now() >= dt:
         print('yeet')
         query = "update exchange_rate SET next_reset = %s"
-        value = dt + datetime.timedelta(seconds=30)
+        value = dt + datetime.timedelta(minutes=1)
         cursor.execute(query,(value.strftime('%Y-%m-%d %H:%M:%S'),))
         cnx.commit()
         cnx.close()
-        time.sleep(10)
+        time.sleep(20)
     else:
         pass
+    recur()
+recur()
