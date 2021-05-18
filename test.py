@@ -24,25 +24,22 @@ def make_connection():
 def something():
     cnx, cursor = make_connection()
     query = "INSERT INTO exchange_rate(next_reset) VALUES('%s') "
-    value = datetime.datetime(2021,5,18,8,54,30).strftime('%Y-%m-%d %H:%M:%S')
+    value = datetime.datetime(2021,5,18,18,50,0).strftime('%Y-%m-%d %H:%M:%S')
     cursor.execute("update exchange_rate SET next_reset = %s",(value,))
     cnx.commit()
     cnx.close()
 something()
 
-def recur():
+while True:
     cnx, cursor = make_connection()
     cursor.execute("select next_reset from exchange_rate")
     dt = datetime.datetime.strptime(cursor.fetchone()[0], '%Y-%m-%d %H:%M:%S')
     if datetime.datetime.now() >= dt:
         print('yeet')
         query = "update exchange_rate SET next_reset = %s"
-        value = dt + datetime.timedelta(minutes=1)
+        value = dt + datetime.timedelta(seconds= 10)
         cursor.execute(query,(value.strftime('%Y-%m-%d %H:%M:%S'),))
         cnx.commit()
         cnx.close()
-        time.sleep(20)
     else:
         pass
-    recur()
-recur()
