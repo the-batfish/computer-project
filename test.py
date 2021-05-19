@@ -24,7 +24,7 @@ def make_connection():
 def something():
     cnx, cursor = make_connection()
     query = "INSERT INTO exchange_rate(next_reset) VALUES('%s') "
-    value = datetime.datetime(2021,5,18,18,50,0).strftime('%Y-%m-%d %H:%M:%S')
+    value = datetime.datetime(2021,5,19,21,24,0).strftime('%Y-%m-%d %H:%M:%S')
     cursor.execute("update exchange_rate SET next_reset = %s",(value,))
     cnx.commit()
     cnx.close()
