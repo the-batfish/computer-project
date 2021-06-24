@@ -1,29 +1,33 @@
 import mysql.connector
 from mysql.connector import errorcode
 import datetime
+from time import sleep
+import threading
 
-try:
-    cnx = mysql.connector.connect(
-    host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
-    user="uf7gxtzihchkojup",
-    password="K1bhziQq9KnSPAVSnFdH",
-    database='blsuvxgq3bvwh8qw4ah7' 
-    )
+def make_connection():
+    try:
+        cnx = mysql.connector.connect(
+        host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
+        user="uf7gxtzihchkojup",
+        password="K1bhziQq9KnSPAVSnFdH",
+        database='blsuvxgq3bvwh8qw4ah7' 
+        )
 
 
 
-except mysql.connector.Error as err:
-    if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-        print("Something is wrong with your user name or password")
-    elif err.errno == errorcode.ER_BAD_DB_ERROR:
-        print("Database does not exist")
-    else:
-        print(err)
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+    return cnx, cnx.cursor()
 
-cursor = cnx.cursor()
 
 #this function is for first time use
 def add_account(user_id,username,password):
+    cnx, cursor = make_connection()
     try: 
         cursor.execute('INSERT INTO economy_data(user_id , username , password , crypto , money) VALUES (%s , %s , %s , 0 , 0)' , (user_id , username , password))
         cnx.commit()
@@ -34,6 +38,7 @@ def add_account(user_id,username,password):
 
 #this function is for displaying the current and previous exchange rates
 def show_exchange_rate():    
+    cnx, cursor = make_connection()
     cursor.execute('SELECT current_exchange_rate , prev_exchange_rate FROM exchange_rate')
     results = cursor.fetchone()
     print('The current exchange rate is',results[0],'$ per crypto')
@@ -41,6 +46,7 @@ def show_exchange_rate():
 
 #this function is for showing the balance in your account
 def balance(username):
+    cnx, cursor = make_connection()
     query = "SELECT crypto, money FROM economy_data WHERE username = %s" 
     cursor.execute(query,(username,))
     results = cursor.fetchone()
@@ -49,11 +55,13 @@ def balance(username):
 
 #this function is for obtaining the current exchange rate for buying and selling
 def exchange_rate():
+    cnx, cursor = make_connection()
     cursor.execute('SELECT current_exchange_rate FROM exchange_rate')
     return cursor.fetchone()[0]
 
 #this function is for buying crypto
 def buy_crypto(num , username): #here num is the number of cryptos being requested to buy
+    cnx, cursor = make_connection()
     exch = exchange_rate()
     cost = num * exch
     query = "SELECT crypto, money FROM economy_data WHERE username = %s" 
@@ -76,6 +84,7 @@ def buy_crypto(num , username): #here num is the number of cryptos being request
 
 #this function is for buying crypto
 def sell_crypto(num , username): #here num is the number of cryptos being sold
+    cnx, cursor = make_connection()
     exch = exchange_rate()
     sale = num * exch
     query = "SELECT crypto, money FROM economy_data WHERE username = %s" 
@@ -97,6 +106,7 @@ def sell_crypto(num , username): #here num is the number of cryptos being sold
         print('Sorry transaction was unsuccessful due to limited funds')
 
 def exch_r8_refresh():
+    cnx, cursor = make_connection()
     query1 = "SELECT current_exchange_rate , prev_exchange_rate FROM exchange_rate" 
     cursor.execute(query1)
     curr_exch_r8 = cursor.fetchone()[0]
@@ -124,10 +134,24 @@ def exch_r8_refresh():
         new_exch_r8 = round(curr_exch_r8*ratio)
     else:
         new_exch_r8 = 1
-
-    command = "UPDATE exchange_rate SET current_exchange_rate = %s , prev_exchange_rate = %s"
-    values =  (new_exch_r8 , curr_exch_r8)
-    cursor.execute(command, values)
-    cnx.commit()
     cnx.close()
+    prev_exch_r8 = curr_exch_r8
+    return new_exch_r8 , prev_exch_r8
 
+def exch_r8_loop():
+    cnx, cursor = make_connection()
+    while True:
+        cnx, cursor = make_connection()
+        cursor.execute("select next_reset from exchange_rate")
+        results = cursor.fetchone()
+        dt = datetime.datetime.strptime(results[0], '%Y-%m-%d %H:%M:%S')
+        if datetime.datetime.now() >= dt:
+            query = "update exchange_rate SET current_exchange_rate = %s , previous_exchange_rate = %s , next_reset = %s"
+            value = dt + datetime.timedelta(minutes = 30)
+            curr_exch_r8,prev_exch_r8 = exch_r8_refresh()
+            cursor.execute(query,(curr_exch_r8,prev_exch_r8,value.strftime('%Y-%m-%d %H:%M:%S'),))
+            cnx.commit()
+            cnx.close()
+            sleep(5)
+exch_r8_loop = threading.Thread(target=exch_r8_loop,daemon=True)
+exch_r8_loop.start()
