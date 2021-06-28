@@ -26,14 +26,15 @@ def make_connection():
 
 
 #this function is for first time use
-def add_account(user_id,username,password):
+def add_account(username,password):
     cnx, cursor = make_connection()
     try: 
-        cursor.execute('INSERT INTO economy_data(user_id , username , password , crypto , money) VALUES (%s , %s , %s , 0 , 0)' , (user_id , username , password))
+        cursor.execute('INSERT INTO economy_data(username , password , crypto , money) VALUES (%s , %s , %s , 0 , 0)' , (username , password))
         cnx.commit()
         cnx.close()
         print('Account has been succesfully created!')
-    except:
+    except mysql.connector.Error as err:
+        if err.errno =
         print('Account with the same username already exists')
 
 #this function is for displaying the current and previous exchange rates
