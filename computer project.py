@@ -3,6 +3,7 @@ from mysql.connector import errorcode
 import datetime
 from time import sleep
 import threading
+import getpass
 
 def make_connection():
     try:
@@ -24,6 +25,17 @@ def make_connection():
             print(err)
     return cnx, cnx.cursor()
 
+def login():    
+    user = getpass.getuser("Username: ")
+    passw = getpass.getuser("Password: ")
+    f = open("users.txt", "r")
+    for line in f.readlines():
+        us, pw = line.strip().split("|")
+        if (user in us) and (passw in pw):
+            print ("Login successful!")
+            return True
+    print ("Wrong username/password")
+    return False
 
 #this function is for first time use
 def add_account(username,password):
