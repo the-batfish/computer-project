@@ -26,16 +26,25 @@ def make_connection():
     return cnx, cnx.cursor()
 
 def login():    
-    user = getpass.getuser("Username: ")
-    passw = getpass.getuser("Password: ")
-    f = open("users.txt", "r")
-    for line in f.readlines():
-        us, pw = line.strip().split("|")
-        if (user in us) and (passw in pw):
-            print ("Login successful!")
-            return True
-    print ("Wrong username/password")
-    return False
+    user = input('Username :')
+    passw = getpass.getpass("Password: ")
+    cnx, cursor = make_connection()
+    query = 'SELECT password from economy_data where username = %s'
+    cursor.execute(query,(user,))
+    realpass = cursor.fetchone()
+    if realpass == None:
+        print("Wrong username/password")
+        cnx.close()
+        return False , user , passw
+    elif realpass[0] == passw:
+        print('Login Successful!')
+        cnx.close()
+        return True , user , passw
+    else:
+        print("Wrong username/password")
+        cnx.close()
+        return False , user , passw
+
 
 #this function is for first time use
 def add_account(username,password):
@@ -140,6 +149,8 @@ def exch_r8_refresh():
         tot_money += i[0]
         n2 += 1
     avg_money = tot_money/n2
+    if avg_money == 0:
+        avg_money = 1
     
     ratio = avg_crypto/avg_money
     if round(curr_exch_r8*ratio) <= 1: 
@@ -160,7 +171,7 @@ def exch_r8_loop():
         results = cursor.fetchone()
         dt = datetime.datetime.strptime(results[0], '%Y-%m-%d %H:%M:%S')
         if datetime.datetime.now() >= dt:
-            query = "update exchange_rate SET current_exchange_rate = %s , previous_exchange_rate = %s , next_reset = %s"
+            query = "update exchange_rate SET current_exchange_rate = %s , prev_exchange_rate = %s , next_reset = %s"
             value = dt + datetime.timedelta(minutes = 30)
             curr_exch_r8,prev_exch_r8 = exch_r8_refresh()
             cursor.execute(query,(curr_exch_r8,prev_exch_r8,value.strftime('%Y-%m-%d %H:%M:%S'),))
@@ -169,3 +180,17 @@ def exch_r8_loop():
             sleep(5)
 exch_r8_loop = threading.Thread(target=exch_r8_loop,daemon=True)
 exch_r8_loop.start()
+
+
+a,username,password = login()
+if a == False:
+    print('bruh')
+else:
+    while True:
+        print('''
+        1. balance
+        2.
+        ''')
+        break
+
+
