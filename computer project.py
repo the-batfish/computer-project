@@ -4,6 +4,7 @@ import datetime
 from time import sleep
 import threading
 import getpass
+import matplotlib.pyplot as plt
 
 def make_connection():
     try:
@@ -25,26 +26,51 @@ def make_connection():
             print(err)
     return cnx, cnx.cursor()
 
-def login():    
-    user = input('Username :')
-    passw = getpass.getpass("Password: ")
-    cnx, cursor = make_connection()
-    query = 'SELECT password from economy_data where username = %s'
-    cursor.execute(query,(user,))
-    realpass = cursor.fetchone()
-    if realpass == None:
-        print("Wrong username/password")
-        cnx.close()
-        return False , user , passw
-    elif realpass[0] == passw:
-        print('Login Successful!')
-        cnx.close()
-        return True , user , passw
-    else:
-        print("Wrong username/password")
-        cnx.close()
-        return False , user , passw
-
+def login_register():    
+    print('''
+        Enter your choice:
+        1. login
+        2. register
+        ''')
+    choice = int(input('Enter your choice here: '))
+    if choice == 1:
+        user = input('Username :')
+        passw = getpass.getpass("Password: ")
+        cnx, cursor = make_connection()
+        query = 'SELECT password from economy_data where username = %s'
+        cursor.execute(query,(user,))
+        realpass = cursor.fetchone()
+        if realpass == None:
+            print("Wrong username/password")
+            cnx.close()
+            return False , user
+        elif realpass[0] == passw:
+            print('Login Successful!')
+            cnx.close()
+            return True , user
+        else:
+            print("Wrong username/password")
+            cnx.close()
+            return False , user
+    elif choice == 2:
+        cnx, cursor = make_connection()
+        try: 
+            while True:
+                user = input('Username :')
+                passw1 = getpass.getpass("Password: ")
+                passw2 = getpass.getpass("Confirm Password: ")
+                if passw1 == passw2:
+                    break
+                else:
+                    print('Wrong password. Try again!')
+            cursor.execute('INSERT INTO economy_data(username , password) VALUES (%s , %s)' , (user , passw1))
+            cnx.commit()
+            cnx.close()
+            print('Account has been succesfully created!')
+            return True, user
+        except mysql.connector.IntegrityError:
+            print("Account already exists")
+            return False, user
 
 #this function is for first time use
 def add_account(username,password):
@@ -60,10 +86,19 @@ def add_account(username,password):
 #this function is for displaying the current and previous exchange rates
 def show_exchange_rate():    
     cnx, cursor = make_connection()
-    cursor.execute('SELECT current_exchange_rate , prev_exchange_rate FROM exchange_rate')
-    results = cursor.fetchone()
-    print('The current exchange rate is',results[0],'$ per crypto')
-    print('The previous exchange rate was',results[1],'$ per crypto')
+    cursor.execute('SELECT crypto , date FROM exchange_rate')
+    results = cursor.fetchall()
+    xvalues = []
+    yvalues = []
+    for i in range(0,3):
+        xvalues.append(results[i][1])
+    for k in range(0,3):
+        yvalues.append(results[k][0])
+    plt.plot(xvalues,yvalues)
+    plt.ylabel('EXCHANGE RATE')
+    plt.xlabel('DATE')
+    plt.show()
+    cnx.close()
 
 #this function is for showing the balance in your account
 def balance(username):
@@ -73,12 +108,15 @@ def balance(username):
     results = cursor.fetchone()
     print('You have',results[0],'cryptos in your account')
     print('You have',results[1],'$ in your account')
+    cnx.close()
 
 #this function is for obtaining the current exchange rate for buying and selling
 def exchange_rate():
     cnx, cursor = make_connection()
-    cursor.execute('SELECT current_exchange_rate FROM exchange_rate')
-    return cursor.fetchone()[0]
+    cursor.execute('SELECT crypto FROM exchange_rate ORDER BY date DESC LIMIT 1')
+    result = cursor.fetchone()[0]
+    cnx.close()
+    return result
 
 #this function is for buying crypto
 def buy_crypto(num , username): #here num is the number of cryptos being requested to buy
@@ -101,6 +139,7 @@ def buy_crypto(num , username): #here num is the number of cryptos being request
         print('Transaction was completely successful')
         print(num,'cryptos have been added to your account')
     else:
+        cnx.close()
         print('Sorry transaction was unsuccessful due to limited funds')
 
 #this function is for buying crypto
@@ -124,11 +163,12 @@ def sell_crypto(num , username): #here num is the number of cryptos being sold
         print('Transaction was completely successful')
         print(sale,'$ have been added to your account')
     else:
+        cnx.close()
         print('Sorry transaction was unsuccessful due to limited funds')
 
 def exch_r8_refresh():
     cnx, cursor = make_connection()
-    query1 = "SELECT current_exchange_rate , prev_exchange_rate FROM exchange_rate" 
+    query1 = "SELECT crypto FROM exchange_rate ORDER BY date DESC LIMIT 1" 
     cursor.execute(query1)
     curr_exch_r8 = cursor.fetchone()[0]
 
@@ -160,37 +200,52 @@ def exch_r8_refresh():
     else:
         new_exch_r8 = round(curr_exch_r8*ratio)
     cnx.close()
-    prev_exch_r8 = curr_exch_r8
-    return new_exch_r8 , prev_exch_r8
+    return new_exch_r8
 
 def exch_r8_loop():
-    cnx, cursor = make_connection()
     while True:
         cnx, cursor = make_connection()
-        cursor.execute("select next_reset from exchange_rate")
-        results = cursor.fetchone()
-        dt = datetime.datetime.strptime(results[0], '%Y-%m-%d %H:%M:%S')
-        if datetime.datetime.now() >= dt:
-            query = "update exchange_rate SET current_exchange_rate = %s , prev_exchange_rate = %s , next_reset = %s"
-            value = dt + datetime.timedelta(minutes = 30)
-            curr_exch_r8,prev_exch_r8 = exch_r8_refresh()
-            cursor.execute(query,(curr_exch_r8,prev_exch_r8,value.strftime('%Y-%m-%d %H:%M:%S'),))
+        cursor.execute("SELECT date FROM exchange_rate ORDER BY date DESC LIMIT 1")
+        results = cursor.fetchone()[0]
+        dt = datetime.datetime.strptime(results, '%Y-%m-%d %H:%M:%S')
+        if datetime.datetime.now() >= (dt + datetime.timedelta(days=1)):
+            curr_exch_r8 = exch_r8_refresh()
+            query = "INSERT INTO exchange_rate(date, crypto) VALUES(%s,%s)"
+            cursor.execute(query,(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),curr_exch_r8))
             cnx.commit()
-            cnx.close()
             sleep(5)
+        cnx.close()
 exch_r8_loop = threading.Thread(target=exch_r8_loop,daemon=True)
 exch_r8_loop.start()
 
-
-a,username,password = login()
+a,username = login_register()
 if a == False:
     print('bruh')
 else:
     while True:
         print('''
-        1. balance
-        2.
-        ''')
-        break
-
-
+       1. Balance
+       2. Show Exchange Rate
+       3. Buy Crypto
+       4. Sell Crypto
+       0. Exit
+    ''')
+        choice = int(input('Enter your choice :'))
+        if choice == 0:
+            break
+        elif choice == 1:
+            balance(username)
+        elif choice == 2:
+            show_exchange_rate()
+        elif choice == 3:
+            buy_amount = int(input('Enter the number of cryptos you want to buy: '))
+            if buy_amount > 0:
+                buy_crypto(buy_amount,username)
+            else:
+                print('Enter a proper value!')
+        elif choice == 4:
+            sell_amount = int(input('Enter the number of cryptos you want to buy: '))
+            if sell_amount > 0:
+                sell_crypto(sell_amount,username)
+            else:
+                print('Enter a proper value!')  
