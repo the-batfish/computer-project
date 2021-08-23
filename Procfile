@@ -1,1 +1,0 @@
-worker: python3 exchange rate loop.py
