@@ -295,8 +295,8 @@ else:
                 2. esterium
                 3. binguscoin
                 4. floppacoin
-                enter your choice here: 
-                '''))
+                enter your choice here: '''
+                ))
                 if cryptochoice2 == 1:
                     crypto2 = 'botcoin'
                     break
