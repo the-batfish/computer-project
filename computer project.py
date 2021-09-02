@@ -238,9 +238,7 @@ exch_r8_loop = threading.Thread(target=exch_r8_loop,daemon=True)
 exch_r8_loop.start()
 
 a,username = login_register()
-if a == False:
-    print('bruh')
-else:
+if a == True:
     while True:
         print('''
        1. Balance
