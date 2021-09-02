@@ -82,7 +82,7 @@ def buy_crypto(num , username): #here num is the number of cryptos being request
     else:
         print('Sorry transaction was unsuccessful due to limited funds')
 
-#this function is for buying crypto
+#this function is for selling crypto
 def sell_crypto(num , username): #here num is the number of cryptos being sold
     cnx, cursor = make_connection()
     exch = exchange_rate()
