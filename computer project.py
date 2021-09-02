@@ -6,18 +6,17 @@ import threading
 import getpass
 import matplotlib.pyplot as plt
 
-currencies = ['botcoin','esterium','binguscoin','floppacoin']
+currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin']
+
 
 def make_connection():
     try:
         cnx = mysql.connector.connect(
-        host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
-        user="uf7gxtzihchkojup",
-        password="K1bhziQq9KnSPAVSnFdH",
-        database='blsuvxgq3bvwh8qw4ah7' 
+            host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
+            user="uf7gxtzihchkojup",
+            password="K1bhziQq9KnSPAVSnFdH",
+            database='blsuvxgq3bvwh8qw4ah7'
         )
-
-
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -28,7 +27,8 @@ def make_connection():
             print(err)
     return cnx, cnx.cursor()
 
-def login_register():    
+
+def login_register():
     print('''
         Enter your choice:
         1. login
@@ -40,23 +40,23 @@ def login_register():
         passw = getpass.getpass("Password: ")
         cnx, cursor = make_connection()
         query = 'SELECT password from economy_data where username = %s'
-        cursor.execute(query,(user,))
+        cursor.execute(query, (user,))
         realpass = cursor.fetchone()
         if realpass == None:
             print("Wrong username/password")
             cnx.close()
-            return False , user
+            return False, user
         elif realpass[0] == passw:
             print('Login Successful!')
             cnx.close()
-            return True , user
+            return True, user
         else:
             print("Wrong username/password")
             cnx.close()
-            return False , user
+            return False, user
     elif choice == 2:
         cnx, cursor = make_connection()
-        try: 
+        try:
             while True:
                 user = input('Username :')
                 passw1 = getpass.getpass("Password: ")
@@ -65,7 +65,8 @@ def login_register():
                     break
                 else:
                     print('Wrong password. Try again!')
-            cursor.execute('INSERT INTO economy_data(username , password) VALUES (%s , %s)' , (user , passw1))
+            cursor.execute(
+                'INSERT INTO economy_data(username , password) VALUES (%s , %s)', (user, passw1))
             cnx.commit()
             cnx.close()
             print('Account has been succesfully created!')
@@ -74,15 +75,16 @@ def login_register():
             print("Account already exists")
             return False, user
 
+
 def del_account(username):
     cnx, cursor = make_connection()
     passw = getpass.getpass('Confirm your password to delete account: ')
     query = 'SELECT password from economy_data where username = %s'
-    cursor.execute(query,(username,))
+    cursor.execute(query, (username,))
     truepass = cursor.fetchone()[0]
     if passw == truepass:
         query2 = 'DELETE FROM economy_data WHERE username = %s'
-        cursor.execute(query2,(username,))
+        cursor.execute(query2, (username,))
         cnx.commit()
         cnx.close()
         print('Account has been deleted')
@@ -92,53 +94,63 @@ def del_account(username):
         cnx.close()
         return False
 
-#this function is for displaying the current and previous exchange rates
-def show_exchange_rate():    
+# this function is for displaying the current and previous exchange rates
+
+
+def show_exchange_rate():
     for i in currencies:
         cnx, cursor = make_connection()
         cursor.execute(f'SELECT {i} , date FROM {i} ORDER BY date ASC')
         results = cursor.fetchall()
         xvalues = []
         yvalues = []
-        for j in range(0,len(results)):
+        for j in range(0, len(results)):
             xvalues.append(results[j][1])
-        for k in range(0,len(results)):
+        for k in range(0, len(results)):
             yvalues.append(results[k][0])
-        plt.plot(xvalues,yvalues, label = i)
+        plt.plot(xvalues, yvalues, label=i)
         plt.legend(currencies)
         plt.ylabel('EXCHANGE RATE')
         plt.xlabel('DATE')
         cnx.close()
     plt.show()
 
-#this function is for showing the balance in your account
+# this function is for showing the balance in your account
+
+
 def balance(username):
     cnx, cursor = make_connection()
-    query = "SELECT money , botcoin , esterium , binguscoin , floppacoin FROM economy_data WHERE username = %s" 
-    cursor.execute(query,(username,))
+    query = "SELECT money , botcoin , esterium , binguscoin , floppacoin FROM economy_data WHERE username = %s"
+    cursor.execute(query, (username,))
     results = cursor.fetchone()
-    print('You have',results[0],'$ in your account')
-    print('You have',results[1],'botcoins in your account')
-    print('You have',results[2],'esterium in your account')
-    print('You have',results[3],'binguscoin in your account')
-    print('You have',results[4],'floppacoin in your account')
+    print('You have', results[0], '$ in your account')
+    print('You have', results[1], 'botcoins in your account')
+    print('You have', results[2], 'esterium in your account')
+    print('You have', results[3], 'binguscoin in your account')
+    print('You have', results[4], 'floppacoin in your account')
     cnx.close()
 
-#this function is for obtaining the current exchange rate for buying and selling
+# this function is for obtaining the current exchange rate for buying and selling
+
+
 def exchange_rate(currency):
     cnx, cursor = make_connection()
-    cursor.execute(f'SELECT {currency} FROM {currency} ORDER BY date DESC LIMIT 1')
+    cursor.execute(
+        f'SELECT {currency} FROM {currency} ORDER BY date DESC LIMIT 1')
     result = cursor.fetchone()[0]
     cnx.close()
     return result
 
-#this function is for buying crypto
-def buy_crypto(num , username , currency): #here num is the number of cryptos being requested to buy
+# this function is for buying crypto
+
+
+# here num is the number of cryptos being requested to buy
+def buy_crypto(num, username, currency):
     cnx, cursor = make_connection()
     exch = exchange_rate(currency)
     cost = num * exch
-    query = f"SELECT {currency} , money FROM economy_data WHERE username = %s" 
-    cursor.execute(query,(username,)) 
+    query = f"SELECT {currency} , money FROM economy_data WHERE username = %s"
+    cursor.execute(query, (username,))
     values = cursor.fetchone()
     available_crypto = values[0]
     available_money = values[1]
@@ -146,7 +158,7 @@ def buy_crypto(num , username , currency): #here num is the number of cryptos be
         new_balance = available_money - cost
         new_crypto_balance = available_crypto + num
         command = f"UPDATE economy_data SET {currency} = %s , money = %s WHERE username = %s"
-        values =  (new_crypto_balance , new_balance , username)
+        values = (new_crypto_balance, new_balance, username)
         cursor.execute(command, values)
         cnx.commit()
         cnx.close()
@@ -156,13 +168,15 @@ def buy_crypto(num , username , currency): #here num is the number of cryptos be
         cnx.close()
         print('Sorry transaction was unsuccessful due to limited funds')
 
-#this function is for buying crypto
-def sell_crypto(num , username , currency): #here num is the number of cryptos being sold
+# this function is for buying crypto
+
+
+def sell_crypto(num, username, currency):  # here num is the number of cryptos being sold
     cnx, cursor = make_connection()
     exch = exchange_rate(currency)
     sale = num * exch
-    query = f"SELECT {currency}, money FROM economy_data WHERE username = %s" 
-    cursor.execute(query,(username,)) 
+    query = f"SELECT {currency}, money FROM economy_data WHERE username = %s"
+    cursor.execute(query, (username,))
     values = cursor.fetchone()
     available_crypto = values[0]
     available_money = values[1]
@@ -170,25 +184,26 @@ def sell_crypto(num , username , currency): #here num is the number of cryptos b
         new_balance = available_money + sale
         new_crypto_balance = available_crypto - num
         command = f"UPDATE economy_data SET {currency} = %s , money = %s WHERE username = %s"
-        values =  (new_crypto_balance , new_balance , username)
+        values = (new_crypto_balance, new_balance, username)
         cursor.execute(command, values)
         cnx.commit()
         cnx.close()
         print('Transaction was completely successful')
-        print(sale,'$ have been added to your account')
+        print(sale, '$ have been added to your account')
     else:
         cnx.close()
         print('Sorry transaction was unsuccessful due to limited funds')
 
+
 def exch_r8_refresh(currency):
     cnx, cursor = make_connection()
-    query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY date DESC LIMIT 1" 
+    query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY date DESC LIMIT 1"
     cursor.execute(query1)
     results = cursor.fetchone()
     curr_exch_r8 = results[0]
     curr_ratio = results[1]
 
-    query2 = f"SELECT {currency} FROM economy_data" 
+    query2 = f"SELECT {currency} FROM economy_data"
     cursor.execute(query2)
     n1 = 0
     tot_crypto = 0
@@ -197,7 +212,7 @@ def exch_r8_refresh(currency):
         n1 += 1
     avg_crypto = tot_crypto/n1
 
-    query3 = "SELECT money FROM economy_data" 
+    query3 = "SELECT money FROM economy_data"
     cursor.execute(query3)
     n2 = 0
     tot_money = 0
@@ -207,18 +222,19 @@ def exch_r8_refresh(currency):
     avg_money = tot_money/n2
     if avg_money == 0:
         avg_money = 1
-    
-    ratio = round(avg_crypto/avg_money,2)
+
+    ratio = round(avg_crypto/avg_money, 2)
     if ratio == curr_ratio:
         new_exch_r8 = curr_exch_r8
-    elif round(curr_exch_r8*ratio) <= 1: 
+    elif round(curr_exch_r8*ratio) <= 1:
         new_exch_r8 = 1
     elif round(curr_exch_r8*ratio) >= 100:
         new_exch_r8 = 100
     else:
         new_exch_r8 = round(curr_exch_r8*ratio)
     cnx.close()
-    return new_exch_r8 , ratio
+    return new_exch_r8, ratio
+
 
 def exch_r8_loop():
     while True:
@@ -228,16 +244,19 @@ def exch_r8_loop():
             results = cursor.fetchone()[0]
             dt = datetime.datetime.strptime(results, '%Y-%m-%d')
             if datetime.datetime.now() >= (dt + datetime.timedelta(days=1)):
-                curr_exch_r8 , ratio  = exch_r8_refresh(i)
+                curr_exch_r8, ratio = exch_r8_refresh(i)
                 query = f"INSERT INTO {i}(date, {i} , ratio) VALUES(%s,%s,%s)"
-                cursor.execute(query,(datetime.datetime.now().strftime('%Y-%m-%d'),curr_exch_r8,ratio))
+                cursor.execute(query, (datetime.datetime.now().strftime(
+                    '%Y-%m-%d'), curr_exch_r8, ratio))
                 cnx.commit()
                 sleep(5)
             cnx.close()
-exch_r8_loop = threading.Thread(target=exch_r8_loop,daemon=True)
+
+
+exch_r8_loop = threading.Thread(target=exch_r8_loop, daemon=True)
 exch_r8_loop.start()
 
-a,username = login_register()
+a, username = login_register()
 if a == True:
     while True:
         print('''
@@ -267,7 +286,7 @@ if a == True:
                 if cryptochoice1 == 1:
                     crypto1 = 'botcoin'
                     break
-                elif cryptochoice1 ==2:
+                elif cryptochoice1 == 2:
                     crypto1 = 'esterium'
                     break
                 elif cryptochoice1 == 3:
@@ -279,9 +298,10 @@ if a == True:
                 else:
                     print('Enter a valid option!')
 
-            buy_amount = int(input('Enter the number of cryptos you want to buy: '))
+            buy_amount = int(
+                input('Enter the number of cryptos you want to buy: '))
             if buy_amount > 0:
-                buy_crypto(buy_amount,username, crypto1)
+                buy_crypto(buy_amount, username, crypto1)
             else:
                 print('Enter a proper value!')
         elif choice == 4:
@@ -292,11 +312,11 @@ if a == True:
                 3. binguscoin
                 4. floppacoin
                 enter your choice of cryptocurrency here: '''
-                ))
+                                          ))
                 if cryptochoice2 == 1:
                     crypto2 = 'botcoin'
                     break
-                elif cryptochoice2 ==2:
+                elif cryptochoice2 == 2:
                     crypto2 = 'esterium'
                     break
                 elif cryptochoice2 == 3:
@@ -308,10 +328,11 @@ if a == True:
                 else:
                     print('Enter a valid option!')
 
-            sell_amount = int(input('Enter the number of cryptos you want to sell: '))
+            sell_amount = int(
+                input('Enter the number of cryptos you want to sell: '))
 
             if sell_amount > 0:
-                sell_crypto(sell_amount,username,crypto2)
+                sell_crypto(sell_amount, username, crypto2)
             else:
                 print('Enter a proper value!')
         elif choice == 5:
