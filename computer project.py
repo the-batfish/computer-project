@@ -33,12 +33,11 @@ def add_account(username,password):
         cnx.commit()
         cnx.close()
         print('Account has been succesfully created!')
-    except mysql.connector.Error as err:
-        if err.errno =
+    except mysql.connector.IntegrityError:
         print('Account with the same username already exists')
 
 #this function is for displaying the current and previous exchange rates
-def show_exchange_rate():    
+def show_exchange_rate():
     cnx, cursor = make_connection()
     cursor.execute('SELECT current_exchange_rate , prev_exchange_rate FROM exchange_rate')
     results = cursor.fetchone()
