@@ -239,7 +239,7 @@ exch_r8_loop.start()
 
 a,username = login_register()
 if a == False:
-    print('bruh')
+    print('Wrong username/password!!')
 else:
     while True:
         print('''
@@ -260,12 +260,11 @@ else:
         elif choice == 3:
             while True:
                 cryptochoice1 = int(input('''
-                These are the choices of crypto currency:
                 1. botcoin
                 2. esterium
                 3. binguscoin
                 4. floppacoin
-                enter your choice here: 
+                enter your choice of cryptocurrency here: 
                 '''))
                 if cryptochoice1 == 1:
                     crypto1 = 'botcoin'
@@ -290,12 +289,11 @@ else:
         elif choice == 4:
             while True:
                 cryptochoice2 = int(input('''
-                These are the choices of crypto currency:
                 1. botcoin
                 2. esterium
                 3. binguscoin
                 4. floppacoin
-                enter your choice here: '''
+                enter your choice of cryptocurrency here: '''
                 ))
                 if cryptochoice2 == 1:
                     crypto2 = 'botcoin'
@@ -322,4 +320,4 @@ else:
             if del_account(username) == True:
                 break
             else:
-                pass
+                pass    
