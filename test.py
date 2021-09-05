@@ -232,4 +232,3 @@ class RegisterPage(ttk.Frame):
 # Starting Gui
 app = App()
 app.mainloop()
-    

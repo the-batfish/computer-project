@@ -1,3 +1,4 @@
+from re import I
 import mysql.connector
 from mysql.connector import errorcode
 import datetime
@@ -5,17 +6,24 @@ from time import sleep
 import threading
 import getpass
 import matplotlib.pyplot as plt
+import pickle
+import codecs
+import json
 
 currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin']
 
+with open('data.dat','rb') as f:
+    dat = pickle.load(f).replace("'",'"2')
+    data =  json.loads(codecs.decode(dat, "rot13", "strict"))
+    print(data)
 
 def make_connection():
     try:
         cnx = mysql.connector.connect(
-            host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
-            user="uf7gxtzihchkojup",
-            password="K1bhziQq9KnSPAVSnFdH",
-            database='blsuvxgq3bvwh8qw4ah7'
+            host = data['host'],
+            user=data['user'],
+            password=data['password'],
+            database=data['database']
         )
 
     except mysql.connector.Error as err:
@@ -199,7 +207,7 @@ def exch_r8_refresh(currency):
     cnx, cursor = make_connection()
     query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY date DESC LIMIT 1"
     cursor.execute(query1)
-    results = cursor.fetchone()
+    results = cvcursor.fetchone()
     curr_exch_r8 = results[0]
     curr_ratio = results[1]
 
@@ -228,8 +236,6 @@ def exch_r8_refresh(currency):
         new_exch_r8 = curr_exch_r8
     elif round(curr_exch_r8*ratio) <= 1:
         new_exch_r8 = 1
-    elif round(curr_exch_r8*ratio) >= 100:
-        new_exch_r8 = 100
     else:
         new_exch_r8 = round(curr_exch_r8*ratio)
     cnx.close()
