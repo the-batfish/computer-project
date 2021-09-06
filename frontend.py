@@ -686,7 +686,7 @@ class Coin(ttk.Frame):
             (round(width), round(height)), Image.BICUBIC))
         self.img_label.configure(image=self.logo)
         # Change entry font size
-        self.coin_font["size"] = x//90
+        self.coin_font["size"] = x//25
         # Change Every Other Font Size
         self.controller.resize(event)
 
