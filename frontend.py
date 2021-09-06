@@ -614,6 +614,7 @@ class Market(Toplevel):
         self.botc.set(f"Bot Coins in hand : {balances[1]}")
         self.esterium.set(f"Esterium in hand :{balances[2]}")
         self.bingus.set(f"Bingus Coins in hand : {balances[3]}")
+        self.floppa.set(f"Floppa Coins in hand : {balances[4]}")
 
 
 class Coin(ttk.Frame):
@@ -695,14 +696,15 @@ class Coin(ttk.Frame):
             self.toplevel.set_balance()
         else:
             messagebox.showwarning(
-                "Unsucessful", "The transaction was unsucessful")
+                "Unsuccessful", "The transaction was unsucessful")
 
     def sell(self):
+        print('btuh')
         if backend.sell_crypto(self.coinAmount.get(), self.username, self.coin) == True:
             messagebox.showinfo("Sucessful", "The transaction was sucessful")
         else:
             messagebox.showwarning(
-                "Unsucessful", "The transaction was unsucessful")
+                "Unsuccessful", "The transaction was unsucessful")
 
 
 # Starting Gui
