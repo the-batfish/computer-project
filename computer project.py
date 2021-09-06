@@ -13,9 +13,8 @@ import json
 currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin']
 
 with open('data.dat','rb') as f:
-    dat = pickle.load(f).replace("'",'"2')
+    dat = pickle.load(f).replace("'",'"')
     data =  json.loads(codecs.decode(dat, "rot13", "strict"))
-    print(data)
 
 def make_connection():
     try:
@@ -207,7 +206,7 @@ def exch_r8_refresh(currency):
     cnx, cursor = make_connection()
     query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY date DESC LIMIT 1"
     cursor.execute(query1)
-    results = cvcursor.fetchone()
+    results = cursor.fetchone()
     curr_exch_r8 = results[0]
     curr_ratio = results[1]
 
