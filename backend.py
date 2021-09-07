@@ -166,11 +166,10 @@ def sell_crypto(num, username, currency):  # here num is the number of cryptos b
         cursor.execute(command, values)
         cnx.commit()
         cnx.close()
-        print('Transaction was completely successful')
-        print(sale, '$ have been added to your account')
+        return True
     else:
         cnx.close()
-        print('Sorry transaction was unsuccessful due to limited funds')
+        return False
 
 
 def exch_r8_refresh(currency):
