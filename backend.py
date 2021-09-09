@@ -1,12 +1,11 @@
 import codecs
 import json
 import pickle
-
 import datetime
 import threading
 from time import sleep
-
 import matplotlib.pyplot as plt
+import mplfinance as mpl
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -80,22 +79,44 @@ def del_account(username, password):
 # this function is for displaying the current and previous exchange rates
 
 
-def show_exchange_rate():
-    for i in currencies:
-        cnx, cursor = make_connection()
-        cursor.execute(f'SELECT {i} , date FROM {i} ORDER BY date ASC')
-        results = cursor.fetchall()
-        xvalues = []
-        yvalues = []
-        for j in range(0, len(results)):
-            xvalues.append(results[j][1])
-        for k in range(0, len(results)):
-            yvalues.append(results[k][0])
-        plt.plot(xvalues, yvalues, label=i)
-        plt.legend(currencies)
-        plt.ylabel('EXCHANGE RATE')
-        plt.xlabel('DATE')
-        cnx.close()
+def show_exchange_rate(currency):
+
+    cnx, cursor = make_connection()
+    cursor.execute(f'SELECT {currency} , date FROM {currency} ORDER BY date ASC')
+    results = cursor.fetchall()
+    ohlc = []
+    xvalues = []
+    yvalues = []
+    for j in range(0, len(results)):
+        xvalues.append(results[j][1])
+    for k in range(0, len(results)):
+        yvalues.append(results[k][0])
+
+    plt.plot(label=currency)
+    bruh = []
+    for i in range(1, len(xvalues)+1):
+        bruh.append(i)
+    plt.xticks(bruh,xvalues)
+    plt.legend(currencies)
+    plt.xlabel('DATE')
+    plt.ylabel('EXCHANGE RATE')
+    cnx.close()
+
+
+
+    for i in range(1,len(yvalues)):
+ 
+        plt.vlines(x = i, ymin = yvalues[i-1], ymax = yvalues[i], color = 'black', linewidth = 0)
+        
+        if yvalues[i-1] < yvalues[i]:
+            plt.vlines(x = i, ymin = yvalues[i - 1], ymax = yvalues[i], color = 'green', linewidth = 4)
+        
+        elif yvalues[i-1] > yvalues[i]:
+            plt.vlines(x = i, ymin = yvalues[i - 1], ymax = yvalues[i], color = 'red', linewidth = 4)  
+            
+        if yvalues[i-1] == yvalues[i]:
+            plt.vlines(x = i, ymin = yvalues[i -1], ymax = yvalues[i] + 0.1, color = 'black', linewidth = 10)  
+          
     plt.show()
 
 # this function is for showing the balance in your account
@@ -144,7 +165,6 @@ def buy_crypto(num, username, currency):
         return True
     else:
         return False
-        print('Sorry transaction was unsuccessful due to limited funds')
 
 # this function is for buying crypto
 
@@ -232,7 +252,9 @@ exch_r8_loop = threading.Thread(target=exch_r8_loop, daemon=True)
 exch_r8_loop.start()
 
 def main():
-    a, username = login_register()
+    username = input('Enter the username: ')
+    password = input('Enter the password: ')
+    a, username = login_register(username,password,"Log In")
     if a == True:
         while True:
             print('''
@@ -249,7 +271,7 @@ def main():
             elif choice == 1:
                 balance(username)
             elif choice == 2:
-                show_exchange_rate()
+                show_exchange_rate('botcoin')
             elif choice == 3:
                 while True:
                     cryptochoice1 = int(input('''
