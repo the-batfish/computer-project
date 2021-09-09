@@ -246,10 +246,6 @@ def exch_r8_loop():
                 sleep(5)
             cnx.close()
 
-
-exch_r8_loop = threading.Thread(target=exch_r8_loop, daemon=True)
-exch_r8_loop.start()
-
 def main():
     username = input('Enter the username: ')
     password = input('Enter the password: ')
