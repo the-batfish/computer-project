@@ -241,8 +241,7 @@ def exch_r8_loop():
             if datetime.datetime.now() >= (dt + datetime.timedelta(days=1)):
                 curr_exch_r8, ratio = exch_r8_refresh(i)
                 query = f"INSERT INTO {i}(date, {i} , ratio) VALUES(%s,%s,%s)"
-                cursor.execute(query, (datetime.datetime.now().strftime(
-                    '%Y-%m-%d'), curr_exch_r8, ratio))
+                cursor.execute(query, (datetime.datetime.now().strftime('%Y-%m-%d'), curr_exch_r8, ratio))
                 cnx.commit()
                 sleep(5)
             cnx.close()
