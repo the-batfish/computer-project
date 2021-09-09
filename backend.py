@@ -237,11 +237,11 @@ def exch_r8_loop():
             cnx, cursor = make_connection()
             cursor.execute(f"SELECT date FROM {i} ORDER BY date DESC LIMIT 1")
             results = cursor.fetchone()[0]
-            dt = datetime.datetime.strptime(results, '%Y-%m-%d')
+            dt = datetime.datetime.strptime(results, '%Y-%m-%d %H:%M:%S')
             if datetime.datetime.now() >= (dt + datetime.timedelta(days=1)):
                 curr_exch_r8, ratio = exch_r8_refresh(i)
                 query = f"INSERT INTO {i}(date, {i} , ratio) VALUES(%s,%s,%s)"
-                cursor.execute(query, (datetime.datetime.now().strftime('%Y-%m-%d'), curr_exch_r8, ratio))
+                cursor.execute(query, (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), curr_exch_r8, ratio))
                 cnx.commit()
                 sleep(5)
             cnx.close()

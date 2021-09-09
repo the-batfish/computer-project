@@ -605,7 +605,7 @@ class Market(Toplevel):
         self.container.floppa_label.grid(row=5, column=2, sticky="NEWS")
         # Show Line Graph
         self.container.graph_button = ttk.Button(
-            self, text="Show Graph", command=lambda: backend.show_exchange_rate(), style="big.TButton")
+            self, text="Show Graph", command=lambda: backend.show_exchange_rate('botcoin'), style="big.TButton")
         self.container.graph_button.grid(row=6, column=2, sticky="NEWS")
 
     def set_balance(self):
@@ -699,7 +699,6 @@ class Coin(ttk.Frame):
                 "Unsuccessful", "The transaction was unsucessful")
 
     def sell(self):
-        print('btuh')
         if backend.sell_crypto(self.coinAmount.get(), self.username, self.coin) == True:
             messagebox.showinfo("Sucessful", "The transaction was sucessful")
         else:

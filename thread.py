@@ -76,3 +76,4 @@ def exch_r8_loop():
                 cnx.commit()
                 sleep(5)
             cnx.close()
+exch_r8_loop()
