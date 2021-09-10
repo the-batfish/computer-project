@@ -1,6 +1,5 @@
 import tkinter
-from tkinter import Toplevel, font, ttk
-from tkinter import messagebox
+from tkinter import font, messagebox, ttk
 
 from PIL import Image, ImageOps, ImageTk
 
@@ -31,10 +30,10 @@ class App(tkinter.Tk):
         # Error Label
         error_LabelStyle = ttk.Style()
         error_LabelStyle.configure(
-            "error.TLabel", font=self.font_error_L, foreground="red")
+            "small.TLabel", font=self.font_error_L)
         # Username and Password Labels
         login_LabelStyle = ttk.Style()
-        login_LabelStyle.configure("login.TLabel", font=self.font_login_L)
+        login_LabelStyle.configure("big.TLabel", font=self.font_login_L)
         # CheckButtons
         CheckButtonStyle = ttk.Style()
         CheckButtonStyle.configure(
@@ -79,8 +78,8 @@ class App(tkinter.Tk):
         x = event.widget.winfo_height() if event.widget.winfo_height(
         ) > event.widget.winfo_width() else event.widget.winfo_width()
         self.font_login_L["size"] = x//49
-        self.font_big_B["size"] = x//25
-        self.font_small_B["size"] = x//81
+        self.font_big_B["size"] = x//36
+        self.font_small_B["size"] = x//100
         self.font_error_L["size"] = x//81
 
 
@@ -99,10 +98,10 @@ class HomePage(ttk.Frame):
         self.logo = ImageTk.PhotoImage(self.image)
 
         # Configuring Rows and Columns
-        for i in range(1, 5):
+        for i in range(4):
             self.rowconfigure(i, weight=1)
             self.columnconfigure(i, weight=1)
-        self.rowconfigure(6, weight=1)
+        self.rowconfigure(5, weight=1)
 
         # To check if frame is behind another frame
         self.hidden = 0
@@ -112,21 +111,21 @@ class HomePage(ttk.Frame):
 
         # Image Label
         self.img_label = ttk.Label(self, image=self.logo)
-        self.img_label.grid(row=1, column=2, rowspan=2, columnspan=2)
+        self.img_label.grid(row=0, column=1, rowspan=2, columnspan=2)
 
         # Buttons
         self.to_login = ttk.Button(
             self, text="Log In", command=lambda: self.controller.show_frame(LogInPage), style="big.TButton")
-        self.to_login.grid(row=3, column=2, sticky="NSEW")
+        self.to_login.grid(row=2, column=1, sticky="NSEW")
         self.to_register = ttk.Button(
             self, text="Create Account", command=lambda: self.controller.show_frame(RegisterPage), style="big.TButton")
-        self.to_register.grid(row=3, column=3, sticky="NSEW")
+        self.to_register.grid(row=2, column=2, sticky="NSEW")
         self.to_delete = ttk.Button(
             self, text="Delete Account",  command=lambda: self.controller.show_frame(DeletePage), style="big.TButton")
-        self.to_delete.grid(row=4, column=2, sticky="NSEW")
+        self.to_delete.grid(row=3, column=1, sticky="NSEW")
         self.quit_app = ttk.Button(
             self, text="Quit App", command=self.controller.destroy, style="big.TButton")
-        self.quit_app.grid(row=4, column=3, sticky="NSEW")
+        self.quit_app.grid(row=3, column=2, sticky="NSEW")
 
     # Dynamically resize fonts and pics
     def resize(self, event):
@@ -138,7 +137,7 @@ class HomePage(ttk.Frame):
             height = width*(1/ratio)
             # Original image is preserved in order to act as refernce
             self.logo = ImageTk.PhotoImage(self.image.resize(
-                (int(width), int(height)), Image.BICUBIC))
+                (round(width), round(height)), Image.BICUBIC))
             self.img_label.configure(image=self.logo)
             # Dynamically resize fonts using Style
             self.controller.resize(event)
@@ -151,11 +150,11 @@ class LogInPage(ttk.Frame):
         self.controller = controller
 
         # Configuring Rows and Columns
-        for i in range(1, 10, 8):
+        for i in range(0, 10, 8):
             self.rowconfigure(i, weight=9)
-        for i in range(2, 9):
+        for i in range(1, 8):
             self.rowconfigure(i, weight=1)
-        for i in range(6):
+        for i in range(5):
             self.columnconfigure(i, weight=1)
 
         # To check if frame is behind another frame
@@ -178,39 +177,39 @@ class LogInPage(ttk.Frame):
         # Label And Entry
         # Username Label
         self.user_label = ttk.Label(self, text="Username",
-                                    style="login.TLabel", anchor="w")
-        self.user_label.grid(row=2, column=2, sticky="SEW", columnspan=2)
+                                    style="big.TLabel", anchor="w")
+        self.user_label.grid(row=1, column=1, sticky="SEW", columnspan=2)
         # Username Entry
         self.user_entry = ttk.Entry(
             self, textvariable=self.username, font=self.font_login_E)
-        self.user_entry.grid(row=3, column=2, sticky="NEW", columnspan=2)
+        self.user_entry.grid(row=2, column=1, sticky="NEW", columnspan=2)
 
         # Password Label
         self.pass_label = ttk.Label(self, text="Password",
-                                    style="login.TLabel", anchor="w")
-        self.pass_label.grid(row=4, column=2, sticky="SEW", columnspan=2)
+                                    style="big.TLabel", anchor="w")
+        self.pass_label.grid(row=3, column=1, sticky="SEW", columnspan=2)
         # Password Entry
         self.pass_entry = ttk.Entry(
             self, textvariable=self.password, show="*", font=self.font_login_E)
-        self.pass_entry.grid(row=5, column=2, sticky="NEW", columnspan=2)
+        self.pass_entry.grid(row=4, column=1, sticky="NEW", columnspan=2)
 
         # Buttons
         # Show Pass
         self.showPass_checkbutton = ttk.Checkbutton(
             self, text="Show Password", variable=self.show, command=lambda: self.s_or_h(), style="small.TCheckbutton", compound=tkinter.LEFT)
-        self.showPass_checkbutton.grid(row=6, column=3, sticky="SE")
+        self.showPass_checkbutton.grid(row=5, column=2, sticky="SE")
         # Home Page Button
         self.home_button = ttk.Button(self, text="To Home Page", style="small.TButton",
                                       command=lambda: self.controller.show_frame(HomePage))
-        self.home_button.grid(row=6, column=2, sticky="SW")
+        self.home_button.grid(row=5, column=1, sticky="SW")
         # Create Account Button
         self.crAcc_button = ttk.Button(self, text="Create Account?", style="small.TButton",
                                        command=lambda: self.controller.show_frame(RegisterPage))
-        self.crAcc_button.grid(row=7, column=2, sticky="SEW", columnspan=2)
+        self.crAcc_button.grid(row=6, column=1, sticky="SEW", columnspan=2)
         # Log In Button
         self.logIn_button = ttk.Button(
-            self, text="LOG IN", style="big.TButton", command=lambda: self.login())
-        self.logIn_button.grid(row=8, column=2, sticky="NSEW", columnspan=2)
+            self, text="LOG IN", style="big.TButton", command=self.login)
+        self.logIn_button.grid(row=7, column=1, sticky="NSEW", columnspan=2)
 
     # Dynamically resize font
     def resize(self, event):
@@ -237,7 +236,7 @@ class LogInPage(ttk.Frame):
                 "Error", "Invalid username/password, please check!")
         elif boolean == True:
             self.controller.iconify()  # Minimizes root window when market is shown
-            Market(self.controller, username)
+            Market(self, username, self.controller)
 
 
 class RegisterPage(ttk.Frame):
@@ -247,13 +246,13 @@ class RegisterPage(ttk.Frame):
         self.controller = controller
 
         # Configuring Rows and Columns
-        for i in range(1, 10):
+        for i in range(9):
             self.rowconfigure(i, weight=1)
-        for i in range(1, 11, 9):
+        for i in range(0, 11, 9):
             self.rowconfigure(i, weight=4)
-        for i in range(1, 8):
+        for i in range(0, 7):
             self.columnconfigure(i, weight=1)
-        for i in range(1, 8, 6):
+        for i in range(0, 8, 6):
             self.columnconfigure(i, weight=4)
 
         # To check if frame is behind another frame
@@ -277,37 +276,37 @@ class RegisterPage(ttk.Frame):
         # Label And Entry
         # Username Label
         self.user_label = ttk.Label(self, text="Enter Username",
-                                    style="login.TLabel", anchor="w")
-        self.user_label.grid(row=4, column=3, sticky="EW", columnspan=1)
+                                    style="big.TLabel", anchor="w")
+        self.user_label.grid(row=3, column=2, sticky="EW", columnspan=1)
         # Username Entry
         self.user_entry = ttk.Entry(
             self, textvariable=self.username, font=self.font_login_E)
-        self.user_entry.grid(row=4, column=5, sticky="EW", columnspan=1)
+        self.user_entry.grid(row=3, column=4, sticky="EW", columnspan=1)
         # Password Label
         self.pass_label = ttk.Label(self, text="Enter Password",
-                                    style="login.TLabel", anchor="w")
-        self.pass_label.grid(row=5, column=3, sticky="EW", columnspan=1)
+                                    style="big.TLabel", anchor="w")
+        self.pass_label.grid(row=4, column=2, sticky="EW", columnspan=1)
         # Password Entry
         self.pass_entry = ttk.Entry(
             self, textvariable=self.password, show="*", font=self.font_login_E)
-        self.pass_entry.grid(row=5, column=5, sticky="EW", columnspan=1)
+        self.pass_entry.grid(row=4, column=4, sticky="EW", columnspan=1)
         # Password Label
         self.confirmPass_label = ttk.Label(
-            self, text="Confirm Password", style="login.TLabel", anchor="w")
-        self.confirmPass_label.grid(row=6, column=3, sticky="EW", columnspan=1)
+            self, text="Confirm Password", style="big.TLabel", anchor="w")
+        self.confirmPass_label.grid(row=5, column=2, sticky="EW", columnspan=1)
         # Password Entry
         self.confirmPass_entry = ttk.Entry(
             self, textvariable=self.confirm_pass, show="*", font=self.font_login_E)
-        self.confirmPass_entry.grid(row=6, column=5, sticky="EW", columnspan=1)
+        self.confirmPass_entry.grid(row=5, column=4, sticky="EW", columnspan=1)
         # Error Label
         self.error_label = ttk.Label(
-            self, textvariable=self.error_msg, style="error.TLabel")
-        self.error_label.grid(row=7, column=5, sticky="SE")
+            self, textvariable=self.error_msg, style="small.TLabel", foreground="red")
+        self.error_label.grid(row=6, column=4, sticky="SE")
 
         # Divider
-        for i in range(4, 7):
-            ttk.Label(self, text=":", style="login.TLabel",
-                      anchor="w").grid(row=i, column=4, sticky="EW")
+        for i in range(3, 6):
+            ttk.Label(self, text=":", style="big.TLabel",
+                      anchor="w").grid(row=i, column=3, sticky="EW")
 
         # Interactively check entry text
         self.user_entry.bind("<KeyRelease>", self.entry_check)
@@ -318,22 +317,22 @@ class RegisterPage(ttk.Frame):
         # Show Pass
         self.showPass_checkbutton = ttk.Checkbutton(
             self, text="Show Password", variable=self.show, command=lambda: self.s_or_h(), style="small.TCheckbutton", compound=tkinter.LEFT)
-        self.showPass_checkbutton.grid(row=7, column=5, sticky="NE")
+        self.showPass_checkbutton.grid(row=6, column=4, sticky="NE")
         # Home Page Button
         self.home_button = ttk.Button(self, text="To Home Page", style="small.TButton",
                                       command=lambda: self.controller.show_frame(HomePage))
-        self.home_button.grid(row=7, column=3, sticky="NW")
+        self.home_button.grid(row=6, column=2, sticky="NW")
         # Back to Log In Button
         # Back to Log In Button use same font as Create Account Button from LogInPage
         self.backToLogIn_button = ttk.Button(self, text="To Log In?", style="small.TButton",
                                              command=lambda: controller.show_frame(LogInPage))
         self.backToLogIn_button.grid(
-            row=8, column=3, sticky="SEW", columnspan=3)
+            row=7, column=2, sticky="SEW", columnspan=3)
         # Create Account Button
         # Create Account Button use same font as Log In Button from LogInPage
         self.crAcc_button = ttk.Button(
             self, text="CREATE ACCOUNT", style="big.TButton", command=lambda: self.create_account())
-        self.crAcc_button.grid(row=9, column=3, columnspan=3, sticky="NSEW")
+        self.crAcc_button.grid(row=8, column=2, columnspan=3, sticky="NSEW")
 
     # Dynamically resize font
     def resize(self, event):
@@ -392,7 +391,7 @@ class RegisterPage(ttk.Frame):
                 self.username.set("")
                 self.password.set("")
                 self.confirm_pass.set("")
-                Market(self.controller, username)
+                Market(self, username, self.controller)
             else:
                 self.username.set("")
                 self.password.set("")
@@ -407,13 +406,13 @@ class DeletePage(ttk.Frame):
         self.controller = controller
 
         # Configuring Rows and Columns
-        for i in range(1, 10):
+        for i in range(9):
             self.rowconfigure(i, weight=1)
-        for i in range(1, 11, 9):
+        for i in range(0, 11, 9):
             self.rowconfigure(i, weight=4)
-        for i in range(1, 8):
+        for i in range(0, 7):
             self.columnconfigure(i, weight=1)
-        for i in range(1, 8, 6):
+        for i in range(0, 8, 6):
             self.columnconfigure(i, weight=4)
 
         # To check if frame is behind another frame
@@ -437,37 +436,37 @@ class DeletePage(ttk.Frame):
         # Label And Entry
         # Username Label
         self.user_label = ttk.Label(self, text="Enter Username",
-                                    style="login.TLabel", anchor="w")
-        self.user_label.grid(row=4, column=3, sticky="EW", columnspan=1)
+                                    style="big.TLabel", anchor="w")
+        self.user_label.grid(row=3, column=2, sticky="EW", columnspan=1)
         # Username Entry
         self.user_entry = ttk.Entry(
             self, textvariable=self.username, font=self.font_login_E)
-        self.user_entry.grid(row=4, column=5, sticky="EW", columnspan=1)
+        self.user_entry.grid(row=3, column=4, sticky="EW", columnspan=1)
         # Password Label
         self.pass_label = ttk.Label(self, text="Enter Password",
-                                    style="login.TLabel", anchor="w")
-        self.pass_label.grid(row=5, column=3, sticky="EW", columnspan=1)
+                                    style="big.TLabel", anchor="w")
+        self.pass_label.grid(row=4, column=2, sticky="EW", columnspan=1)
         # Password Entry
         self.pass_entry = ttk.Entry(
             self, textvariable=self.password, show="*", font=self.font_login_E)
-        self.pass_entry.grid(row=5, column=5, sticky="EW", columnspan=1)
+        self.pass_entry.grid(row=4, column=4, sticky="EW", columnspan=1)
         # Password Label
         self.confirmPass_label = ttk.Label(
-            self, text="Confirm Password", style="login.TLabel", anchor="w")
-        self.confirmPass_label.grid(row=6, column=3, sticky="EW", columnspan=1)
+            self, text="Confirm Password", style="big.TLabel", anchor="w")
+        self.confirmPass_label.grid(row=5, column=2, sticky="EW", columnspan=1)
         # Password Entry
         self.confirmPass_entry = ttk.Entry(
             self, textvariable=self.confirm_pass, show="*", font=self.font_login_E)
-        self.confirmPass_entry.grid(row=6, column=5, sticky="EW", columnspan=1)
+        self.confirmPass_entry.grid(row=5, column=4, sticky="EW", columnspan=1)
         # Error Label
         self.error_label = ttk.Label(
-            self, textvariable=self.error_msg, text="Remember me", style="error.TLabel")
-        self.error_label.grid(row=7, column=5, sticky="SE")
+            self, textvariable=self.error_msg, text="Remember me", style="small.TLabel", foreground="red")
+        self.error_label.grid(row=6, column=4, sticky="SE")
 
         # Divider
-        for i in range(4, 7):
-            ttk.Label(self, text=":", style="login.TLabel",
-                      anchor="w").grid(row=i, column=4, sticky="EW")
+        for i in range(3, 6):
+            ttk.Label(self, text=":", style="big.TLabel",
+                      anchor="w").grid(row=i, column=3, sticky="EW")
 
         # Interactively check entry text
         self.pass_entry.bind("<KeyRelease>", self.entry_check)
@@ -477,22 +476,22 @@ class DeletePage(ttk.Frame):
         # Show Pass
         self.showPass_checkbutton = ttk.Checkbutton(
             self, text="Show Password", variable=self.show, command=lambda: self.s_or_h(), style="small.TCheckbutton", compound=tkinter.LEFT)
-        self.showPass_checkbutton.grid(row=7, column=5, sticky="NE")
+        self.showPass_checkbutton.grid(row=6, column=4, sticky="NE")
         # Home Page Button
         self.home_button = ttk.Button(self, text="To Home Page", style="small.TButton",
                                       command=lambda: self.controller.show_frame(HomePage))
-        self.home_button.grid(row=7, column=3, sticky="NW")
+        self.home_button.grid(row=6, column=2, sticky="NW")
         # Back to Log In Button
         # Back to Log In Button use same font as Create Account Button from LogInPage
         self.backToLogIn_button = ttk.Button(self, text="To Log In?", style="small.TButton",
                                              command=lambda: controller.show_frame(LogInPage))
         self.backToLogIn_button.grid(
-            row=8, column=3, sticky="SEW", columnspan=3)
+            row=7, column=2, sticky="SEW", columnspan=3)
         # Create Account Button
         # Create Account Button use same font as Log In Button from LogInPage
         self.delAcc_button = ttk.Button(
             self, text="DELETE ACCOUNT", style="big.TButton", command=lambda: self.delete())
-        self.delAcc_button.grid(row=9, column=3, columnspan=3, sticky="NSEW")
+        self.delAcc_button.grid(row=8, column=2, columnspan=3, sticky="NSEW")
 
     # Dynamically resize font
     def resize(self, event):
@@ -538,83 +537,57 @@ class DeletePage(ttk.Frame):
                 messagebox.showerror("Error", "Wrong username/password")
 
 
-class Market(Toplevel):
-    def __init__(self, controller, username):
+class Market(tkinter.Toplevel):
+    def __init__(self, source, username, controller):
         super().__init__(controller)
 
         # Configuring window
-        self.minsize(600, 500)
-        self.resizable(True, False)
+        self.minsize(500, 500)
+        self.geometry("500x500")
         # Bring window to front
         self.lift()
 
         self.controller = controller
         self.username = username
+        self.source = source
+
+        # Stop Source Window which made toplevel window from passing values to resize in controller
+        self.source.hidden = 1
 
         # Initializing Values
         self.balance = tkinter.StringVar()
-        self.botc = tkinter.StringVar()
+        self.botcoin = tkinter.StringVar()
         self.esterium = tkinter.StringVar()
-        self.bingus = tkinter.StringVar()
-        self.floppa = tkinter.StringVar()
+        self.binguscoin = tkinter.StringVar()
+        self.floppacoin = tkinter.StringVar()
 
         self.set_balance()
 
-        # Main Frame
-        self.container = ttk.Frame(self)
-        self.container.grid(row=1, column=1, sticky="NSEW")
-
-        # Configuring rows and columns
-        for i in range(1, 7):
-            self.container.columnconfigure(i, weight=1)
-        for i in range(1, 3):
-            self.container.columnconfigure(i, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
         # Make root window visible when market window is closed
-        self.bind("<Destroy>", lambda event: self.controller.deiconify())
+        self.bind("<Destroy>", self.on_destroy)
 
         # Populating Frame
         # CryptoCoins Trading
-        self.coins = ttk.Notebook(
-            self, width=self.winfo_width()//2, height=self.winfo_height())
+        self.coins = ttk.Notebook(self)
         for i in ("BotCoin", "Esterium", "BingusCoin", "FloppaCoin"):
             self.coins.add(Coin(self.coins, self, self.controller,
                            self.username, i.lower()), text=i)
-        self.coins.grid(row=1, column=1, rowspan=6, sticky="NSEW")
-
-        # Stats
-        # Money
-        self.container.balance_label = ttk.Label(
-            self, textvariable=self.balance, style="login.TLabel")
-        self.container.balance_label.grid(row=1, column=2, sticky="NSEW")
-        # Bot Coins
-        self.container.botc_label = ttk.Label(
-            self, textvariable=self.botc, style="login.TLabel")
-        self.container.botc_label.grid(row=2, column=2, sticky="NEWS")
-        # Esterium
-        self.container.esterium_label = ttk.Label(
-            self, textvariable=self.esterium, style="login.TLabel")
-        self.container.esterium_label.grid(row=3, column=2, sticky="NEWS")
-        # Bingus Coins
-        self.container.bingus_label = ttk.Label(
-            self, textvariable=self.bingus, style="login.TLabel")
-        self.container.bingus_label.grid(row=4, column=2, sticky="NEWS")
-        # Floppa Coins
-        self.container.floppa_label = ttk.Label(
-            self, textvariable=self.floppa, style="login.TLabel")
-        self.container.floppa_label.grid(row=5, column=2, sticky="NEWS")
-        # Show Line Graph
-        self.container.graph_button = ttk.Button(
-            self, text="Show Graph", command=lambda: backend.show_exchange_rate('botcoin'), style="big.TButton")
-        self.container.graph_button.grid(row=6, column=2, sticky="NEWS")
+        self.coins.grid(row=0, column=0, sticky="NSEW")
 
     def set_balance(self):
         balances = backend.balance(self.username)
-        self.balance.set(f"Money in hand : {balances[0]}")
-        self.botc.set(f"Bot Coins in hand : {balances[1]}")
-        self.esterium.set(f"Esterium in hand :{balances[2]}")
-        self.bingus.set(f"Bingus Coins in hand : {balances[3]}")
-        self.floppa.set(f"Floppa Coins in hand : {balances[4]}")
+        self.balance.set(f"Money in hand: {balances[0]}")
+        self.botcoin.set(f"Bot Coins in hand: {balances[1]}")
+        self.esterium.set(f"Esterium in hand: {balances[2]}")
+        self.binguscoin.set(f"Bingus Coins in hand: {balances[3]}")
+        self.floppacoin.set(f"Floppa Coin in hand: {balances[4]}")
+
+    def on_destroy(self, event):
+        self.source.hidden = 0
+        self.controller.deiconify()
 
 
 class Coin(ttk.Frame):
@@ -634,9 +607,9 @@ class Coin(ttk.Frame):
         self.logo = ImageTk.PhotoImage(self.image)
 
         # Configuring Rows and Columns
-        for i in range(1, 4):
+        for i in range(5):
             self.columnconfigure(i, weight=1)
-        for i in range(1, 6):
+        for i in range(8):
             self.rowconfigure(i, weight=1)
 
         # Make Widget Text Resizable
@@ -647,10 +620,35 @@ class Coin(ttk.Frame):
         # Initializing Values
         self.coinAmount = tkinter.IntVar()
 
-        # Populating Frame
+        # Balance and Logout Frame
+        self.title_labelframe = ttk.LabelFrame(self, text=''.join(
+            [" "+i if i == "C" else i for i in self.coin.upper()]), borderwidth=0, labelanchor="s")
+        self.title_labelframe.grid(
+            row=0, column=0, columnspan=5, sticky="NEWS")
+        # Configuring Rows and Columns
+        for i in range(3):
+            self.title_labelframe.rowconfigure(0, weight=1)
+        self.title_labelframe.columnconfigure(0, weight=1)
+
+        # Money Label
+        self.money_label = ttk.Label(
+            self.title_labelframe, textvariable=self.toplevel.balance, style="small.TLabel")
+        self.money_label.grid(row=0, column=0, sticky="NEWS")
+
+        # Crypto Label
+        self.crypto_label = ttk.Label(self.title_labelframe, textvariable=eval(
+            f"self.toplevel.{self.coin}"), style="small.TLabel")
+        self.crypto_label.grid(row=0, column=2, sticky="NEWS")
+
+        # Populating Main Frame
         # Image Label
         self.img_label = ttk.Label(self, image=self.logo)
-        self.img_label.grid(row=1, column=1, rowspan=2, columnspan=3)
+        self.img_label.grid(row=1, column=2)
+
+        # Coin Amount Entry
+        self.coinAmount_entry = ttk.Entry(
+            self, textvariable=self.coinAmount, font=self.coin_font, justify="center", validate="key")
+        self.coinAmount_entry.grid(row=3, column=2, sticky="NSEW")
 
         # Add Coins Button
         self.remove_button = ttk.Button(
@@ -661,19 +659,18 @@ class Coin(ttk.Frame):
                                      command=lambda: self.coinAmount.set(self.coinAmount.get()+1))
         self.add_button.grid(row=3, column=3, sticky="NSEW")
 
-        # Coin Amount Entry
-        self.coinAmount_entry = ttk.Entry(
-            self, textvariable=self.coinAmount, font=self.coin_font, justify="center")
-        self.coinAmount_entry.grid(row=3, column=2, sticky="NSEW")
-
         # Buy Button
         self.buy_button = ttk.Button(
             self, text="BUY", style="big.TButton", command=lambda: self.buy())
-        self.buy_button.grid(row=4, column=1, columnspan=3, sticky="NSEW", )
+        self.buy_button.grid(row=4, column=2, sticky="NSEW", )
         # Sell Button
         self.sell_button = ttk.Button(
             self, text="SELL", style="big.TButton", command=lambda: self.sell())
-        self.sell_button.grid(row=5, column=1, columnspan=3, sticky="NSEW")
+        self.sell_button.grid(row=5, column=2, sticky="NSEW")
+        # Show Line Graph
+        self.graph_button = ttk.Button(
+            self, text="Show Stock Graph", command=lambda: backend.show_exchange_rate(self.coin), style="big.TButton")
+        self.graph_button.grid(row=7, column=2, sticky="NSEW")
 
     def resize(self, event):
         # Keeping picture aspect ratio same when resizing
@@ -681,9 +678,10 @@ class Coin(ttk.Frame):
         width = event.height/3
         height = width*(1/ratio)
         x = event.height if event.height > event.width else event.width
-        # Original image is preserved in order to act as refernce
-        self.logo = ImageTk.PhotoImage(self.image.resize(
-            (round(width), round(height)), Image.BICUBIC))
+        # Original image is preserved in order to act as reference
+        if int(width) > 0 and int(height) > 0:
+            self.logo = ImageTk.PhotoImage(self.image.resize(
+                (round(width), round(height)), Image.BICUBIC))
         self.img_label.configure(image=self.logo)
         # Change entry font size
         self.coin_font["size"] = x//25
@@ -692,18 +690,23 @@ class Coin(ttk.Frame):
 
     def buy(self):
         if backend.buy_crypto(self.coinAmount.get(), self.username, self.coin) == True:
-            messagebox.showinfo("Sucessful", "The transaction was sucessful")
             self.toplevel.set_balance()
+            messagebox.showinfo(
+                "Sucessful", f"{self.coinAmount.get()} {self.title_labelframe['text']}s™ has been ADDED to your account!")
+            self.coinAmount.set(0)
         else:
             messagebox.showwarning(
-                "Unsuccessful", "The transaction was unsucessful")
+                "Unsucessful", "Insufficient Funds!")
 
     def sell(self):
         if backend.sell_crypto(self.coinAmount.get(), self.username, self.coin) == True:
-            messagebox.showinfo("Sucessful", "The transaction was sucessful")
+            self.toplevel.set_balance()
+            messagebox.showinfo(
+                "Sucessful", f"{self.coinAmount.get()} {self.title_labelframe['text']}s™ has been SOLD from your account!")
+            self.coinAmount.set(0)
         else:
             messagebox.showwarning(
-                "Unsuccessful", "The transaction was unsucessful")
+                "Unsucessful", "Insufficient Funds!")
 
 
 # Starting Gui
