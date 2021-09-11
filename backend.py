@@ -102,7 +102,7 @@ def show_exchange_rate(currency):
 
     plt.xticks(rotation = 45)
     plt.plot(xvalues,yvalues)
-    plt.legend(currencies)
+    plt.legend((currency,))
     plt.xlabel('DATE')
     plt.ylabel('EXCHANGE RATE')
     cnx.close()
@@ -267,4 +267,4 @@ def main():
                     break
 
 if __name__ == "__main__":
-    main()
+    main()  

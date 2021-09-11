@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import font, messagebox, ttk
+import re
 
 from PIL import Image, ImageOps, ImageTk
 
@@ -236,7 +237,11 @@ class LogInPage(ttk.Frame):
                 "Error", "Invalid username/password, please check!")
         elif boolean == True:
             self.controller.iconify()  # Minimizes root window when market is shown
-            Market(self, username, self.controller)
+            if self.hidden != 1:
+                Market(self, username, self.controller)
+            else:
+                messagebox.showwarning(
+                    "Already Logged In", "Already Logged In, Check Open Windows")
 
 
 class RegisterPage(ttk.Frame):
@@ -391,7 +396,11 @@ class RegisterPage(ttk.Frame):
                 self.username.set("")
                 self.password.set("")
                 self.confirm_pass.set("")
-                Market(self, username, self.controller)
+                if self.hidden != 1:
+                    Market(self, username, self.controller)
+                else:
+                    messagebox.showwarning(
+                        "Already Logged In", "Already Logged In, Check Open Windows")
             else:
                 self.username.set("")
                 self.password.set("")
@@ -579,11 +588,11 @@ class Market(tkinter.Toplevel):
 
     def set_balance(self):
         balances = backend.balance(self.username)
-        self.balance.set(f"Money in hand: {balances[0]}")
-        self.botcoin.set(f"Bot Coins in hand: {balances[1]}")
-        self.esterium.set(f"Esterium in hand: {balances[2]}")
-        self.binguscoin.set(f"Bingus Coins in hand: {balances[3]}")
-        self.floppacoin.set(f"Floppa Coin in hand: {balances[4]}")
+        self.balance.set(f"Money: {balances[0]}")
+        self.botcoin.set(f"{balances[1]} :Bot Coins")
+        self.esterium.set(f"{balances[2]} :Esterium")
+        self.binguscoin.set(f" {balances[3]} :Bingus Coins")
+        self.floppacoin.set(f" {balances[4]} :Floppa Coin")
 
     def on_destroy(self, event):
         self.source.hidden = 0
@@ -617,28 +626,38 @@ class Coin(ttk.Frame):
 
         # Font
         self.coin_font = font.Font(family="Avenir Next Condensed", size=14)
+
         # Initializing Values
-        self.coinAmount = tkinter.IntVar()
+        self.coinAmount = tkinter.StringVar(value="1")
+
+        # Validation for Coin Entry
+        vcmd = (self.controller.register(self.intValidate), "%S")
 
         # Balance and Logout Frame
         self.title_labelframe = ttk.LabelFrame(self, text=''.join(
             [" "+i if i == "C" else i for i in self.coin.upper()]), borderwidth=0, labelanchor="s")
         self.title_labelframe.grid(
-            row=0, column=0, columnspan=5, sticky="NEWS")
+            row=0, column=0, columnspan=5, sticky="NSEW")
+
         # Configuring Rows and Columns
         for i in range(3):
-            self.title_labelframe.rowconfigure(0, weight=1)
-        self.title_labelframe.columnconfigure(0, weight=1)
+            self.title_labelframe.columnconfigure(i, weight=1)
+        self.title_labelframe.rowconfigure(0, weight=1)
 
         # Money Label
         self.money_label = ttk.Label(
             self.title_labelframe, textvariable=self.toplevel.balance, style="small.TLabel")
-        self.money_label.grid(row=0, column=0, sticky="NEWS")
+        self.money_label.grid(row=0, column=0, sticky="NSW")
+
+        # Log Out Button
+        self.logOut_button = ttk.Button(
+            self.title_labelframe, text="Log Out", style="small.TButton", command=self.toplevel.destroy)
+        self.logOut_button.grid(row=0, column=1, sticky="NSEW")
 
         # Crypto Label
         self.crypto_label = ttk.Label(self.title_labelframe, textvariable=eval(
             f"self.toplevel.{self.coin}"), style="small.TLabel")
-        self.crypto_label.grid(row=0, column=2, sticky="NEWS")
+        self.crypto_label.grid(row=0, column=2, sticky="NSE")
 
         # Populating Main Frame
         # Image Label
@@ -647,16 +666,16 @@ class Coin(ttk.Frame):
 
         # Coin Amount Entry
         self.coinAmount_entry = ttk.Entry(
-            self, textvariable=self.coinAmount, font=self.coin_font, justify="center", validate="key")
+            self, textvariable=self.coinAmount, font=self.coin_font, justify="center", validate="key", validatecommand=vcmd)
         self.coinAmount_entry.grid(row=3, column=2, sticky="NSEW")
 
         # Add Coins Button
         self.remove_button = ttk.Button(
-            self, text="-", style="big.TButton", command=lambda: self.coinAmount.set(self.coinAmount.get()-1))
+            self, text="-", style="big.TButton", command=self.decrease_Amount)
         self.remove_button.grid(row=3, column=1, sticky="NSEW")
         # Remove Coins Button
         self.add_button = ttk.Button(self, text="+", style="big.TButton",
-                                     command=lambda: self.coinAmount.set(self.coinAmount.get()+1))
+                                     command=self.increase_Amount)
         self.add_button.grid(row=3, column=3, sticky="NSEW")
 
         # Buy Button
@@ -671,6 +690,57 @@ class Coin(ttk.Frame):
         self.graph_button = ttk.Button(
             self, text="Show Stock Graph", command=lambda: backend.show_exchange_rate(self.coin), style="big.TButton")
         self.graph_button.grid(row=7, column=2, sticky="NSEW")
+
+    def increase_Amount(self, event=None):
+        amount = self.coinAmount.get()
+        if amount == "":
+            self.coinAmount.set("1")
+        else:
+            self.coinAmount.set(f"{int(amount)+1}")
+
+    def decrease_Amount(self, event=None):
+        amount = self.coinAmount.get()
+        if amount == "":
+            self.coinAmount.set("1")
+        elif int(amount)-1 >= 1:
+            self.coinAmount.set(f"{int(amount)-1}")
+
+    def intValidate(self, text):
+        if not text.isdigit():
+            messagebox.showwarning("Only Digits", "Only Digits Can be Entered")
+            return False
+        else:
+            return True
+
+    def buy(self):
+        try:
+            amount = int(self.coinAmount.get())
+        except ValueError:
+            messagebox.showwarning("Empty", "Amount Cannot be Empty")
+        else:
+            if backend.buy_crypto(amount, self.username, self.coin) == True:
+                self.toplevel.set_balance()
+                messagebox.showinfo(
+                    "Sucessful", f"{amount} {self.title_labelframe['text']}s™ has been ADDED to your account!")
+                self.coinAmount.set("1")
+            else:
+                messagebox.showwarning(
+                    "Unsucessful", "Insufficient Funds!")
+
+    def sell(self):
+        try:
+            amount = int(self.coinAmount.get())
+        except ValueError:
+            messagebox.showwarning("Empty", "Amount Cannot be Empty")
+        else:
+            if backend.sell_crypto(amount, self.username, self.coin) == True:
+                self.toplevel.set_balance()
+                messagebox.showinfo(
+                    "Sucessful", f"{amount} {self.title_labelframe['text']}s™ has been SOLD from your account!")
+                self.coinAmount.set("1")
+            else:
+                messagebox.showwarning(
+                    "Unsucessful", "Insufficient Funds!")   
 
     def resize(self, event):
         # Keeping picture aspect ratio same when resizing
@@ -687,26 +757,6 @@ class Coin(ttk.Frame):
         self.coin_font["size"] = x//25
         # Change Every Other Font Size
         self.controller.resize(event)
-
-    def buy(self):
-        if backend.buy_crypto(self.coinAmount.get(), self.username, self.coin) == True:
-            self.toplevel.set_balance()
-            messagebox.showinfo(
-                "Sucessful", f"{self.coinAmount.get()} {self.title_labelframe['text']}s™ has been ADDED to your account!")
-            self.coinAmount.set(0)
-        else:
-            messagebox.showwarning(
-                "Unsucessful", "Insufficient Funds!")
-
-    def sell(self):
-        if backend.sell_crypto(self.coinAmount.get(), self.username, self.coin) == True:
-            self.toplevel.set_balance()
-            messagebox.showinfo(
-                "Sucessful", f"{self.coinAmount.get()} {self.title_labelframe['text']}s™ has been SOLD from your account!")
-            self.coinAmount.set(0)
-        else:
-            messagebox.showwarning(
-                "Unsucessful", "Insufficient Funds!")
 
 
 # Starting Gui
