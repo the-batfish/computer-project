@@ -1,6 +1,5 @@
 import tkinter
 from tkinter import font, messagebox, ttk
-import re
 
 from PIL import Image, ImageOps, ImageTk
 
