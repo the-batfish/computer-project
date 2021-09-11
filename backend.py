@@ -85,41 +85,27 @@ def del_account(username, password):
 def show_exchange_rate(currency):
 
     cnx, cursor = make_connection()
-    cursor.execute(f'SELECT {currency} , date FROM {currency} ORDER BY date ASC')
-    results = cursor.fetchall()
-    ohlc = []
+    cursor.execute(f'SELECT {currency} , dates FROM {currency} ORDER BY dates DESC LIMIT 10')
+
+    results = cursor.fetchall()[::-1]
+    xvalues1 = []
     xvalues = []
     yvalues = []
     for j in range(0, len(results)):
-        xvalues.append(results[j][1])
+        xvalues1.append(results[j][1])
+
+    for b in range(len(xvalues1) - 10 , len(xvalues1)):
+        xvalues.append(xvalues1[b])
+
     for k in range(0, len(results)):
         yvalues.append(results[k][0])
 
-    plt.plot(label=currency)
-    bruh = []
-    for i in range(1, len(xvalues)+1):
-        bruh.append(i)
-    plt.xticks(bruh,xvalues)
+    plt.xticks(rotation = 45)
+    plt.plot(xvalues,yvalues)
     plt.legend(currencies)
     plt.xlabel('DATE')
     plt.ylabel('EXCHANGE RATE')
     cnx.close()
-
-
-
-    for i in range(1,len(yvalues)):
- 
-        plt.vlines(x = i, ymin = yvalues[i-1], ymax = yvalues[i], color = 'black', linewidth = 0)
-        
-        if yvalues[i-1] < yvalues[i]:
-            plt.vlines(x = i, ymin = yvalues[i - 1], ymax = yvalues[i], color = 'green', linewidth = 4)
-        
-        elif yvalues[i-1] > yvalues[i]:
-            plt.vlines(x = i, ymin = yvalues[i - 1], ymax = yvalues[i], color = 'red', linewidth = 4)  
-            
-        if yvalues[i-1] == yvalues[i]:
-            plt.vlines(x = i, ymin = yvalues[i -1], ymax = yvalues[i] + 0.1, color = 'black', linewidth = 10)  
-          
     plt.show()
 
 # this function is for showing the balance in your account
@@ -139,7 +125,7 @@ def balance(username):
 def exchange_rate(currency):
     cnx, cursor = make_connection()
     cursor.execute(
-        f'SELECT {currency} FROM {currency} ORDER BY date DESC LIMIT 1')
+        f'SELECT {currency} FROM {currency} ORDER BY dates DESC LIMIT 1')
     result = cursor.fetchone()[0]
     cnx.close()
     return result
@@ -193,61 +179,6 @@ def sell_crypto(num, username, currency):  # here num is the number of cryptos b
     else:
         cnx.close()
         return False
-
-
-def exch_r8_refresh(currency):
-    cnx, cursor = make_connection()
-    query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY date DESC LIMIT 1"
-    cursor.execute(query1)
-    results = cursor.fetchone()
-    curr_exch_r8 = results[0]
-    curr_ratio = results[1]
-
-    query2 = f"SELECT {currency} FROM economy_data"
-    cursor.execute(query2)
-    n1 = 0
-    tot_crypto = 0
-    for i in cursor.fetchall():
-        tot_crypto += i[0]
-        n1 += 1
-    avg_crypto = tot_crypto/n1
-
-    query3 = "SELECT money FROM economy_data"
-    cursor.execute(query3)
-    n2 = 0
-    tot_money = 0
-    for i in cursor.fetchall():
-        tot_money += i[0]
-        n2 += 1
-    avg_money = tot_money/n2
-    if avg_money == 0:
-        avg_money = 1
-
-    ratio = round(avg_crypto/avg_money, 2)
-    if ratio == curr_ratio:
-        new_exch_r8 = curr_exch_r8
-    elif round(curr_exch_r8*ratio) <= 1:
-        new_exch_r8 = 1
-    else:
-        new_exch_r8 = round(curr_exch_r8*ratio)
-    cnx.close()
-    return new_exch_r8, ratio
-
-
-def exch_r8_loop():
-    while True:
-        for i in currencies:
-            cnx, cursor = make_connection()
-            cursor.execute(f"SELECT date FROM {i} ORDER BY date DESC LIMIT 1")
-            results = cursor.fetchone()[0]
-            dt = datetime.datetime.strptime(results, '%Y-%m-%d %H:%M:%S')
-            if datetime.datetime.now() >= (dt + datetime.timedelta(days=1)):
-                curr_exch_r8, ratio = exch_r8_refresh(i)
-                query = f"INSERT INTO {i}(date, {i} , ratio) VALUES(%s,%s,%s)"
-                cursor.execute(query, (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), curr_exch_r8, ratio))
-                cnx.commit()
-                sleep(5)
-            cnx.close()
 
 def main():
     username = input('Enter the username: ')

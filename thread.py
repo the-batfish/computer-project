@@ -11,7 +11,7 @@ def make_connection():
             host ='blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com',
             user='uf7gxtzihchkojup',
             password='K1bhziQq9KnSPAVSnFdH',
-            database='oyfhiktd3oiju8dj4nu7'
+            database='blsuvxgq3bvwh8qw4ah7'
         )
 
     except mysql.connector.Error as err:
@@ -25,7 +25,7 @@ def make_connection():
 
 def exch_r8_refresh(currency):
     cnx, cursor = make_connection()
-    query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY date DESC LIMIT 1"
+    query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY dates DESC LIMIT 1"
     cursor.execute(query1)
     results = cursor.fetchone()
     curr_exch_r8 = results[0]
@@ -66,12 +66,12 @@ def exch_r8_loop():
     while True:
         for i in currencies:
             cnx, cursor = make_connection()
-            cursor.execute(f"SELECT date FROM {i} ORDER BY date DESC LIMIT 1")
+            cursor.execute(f"SELECT date FROM {i} ORDER BY dates DESC LIMIT 1")
             results = cursor.fetchone()[0]
             dt = datetime.datetime.strptime(results, '%Y-%m-%d %H:%M:%S')
             if datetime.datetime.now() >= (dt + datetime.timedelta(minutes=10)):
                 curr_exch_r8, ratio = exch_r8_refresh(i)
-                query = f"INSERT INTO {i}(date, {i} , ratio) VALUES(%s,%s,%s)"
+                query = f"INSERT INTO {i}(dates, {i} , ratio) VALUES(%s,%s,%s)"
                 cursor.execute(query, (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), curr_exch_r8, ratio))
                 cnx.commit()
                 sleep(5)
