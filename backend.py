@@ -94,7 +94,7 @@ def show_exchange_rate(currency):
         xvalues1.append(results[j][1])
 
     for b in range(len(xvalues1) - 10 , len(xvalues1)):
-        xvalues.append(xvalues1[b])
+        xvalues.append(xvalues1[b][5:16])
 
     for k in range(0, len(results)):
         yvalues.append(results[k][0])
