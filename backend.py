@@ -12,6 +12,7 @@ except ModuleNotFoundError:
 import mysql.connector
 from mysql.connector import errorcode
 
+currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin']
 
 with open('data.dat','rb') as f:
     dat = pickle.load(f).replace("'",'"')
@@ -94,14 +95,14 @@ def show_exchange_rate(currency):
         xvalues1.append(results[j][1])
 
     for b in range(len(xvalues1) - 10 , len(xvalues1)):
-        xvalues.append(xvalues1[b][5:16])
+        xvalues.append(xvalues1[b])
 
     for k in range(0, len(results)):
         yvalues.append(results[k][0])
 
     plt.xticks(rotation = 45)
     plt.plot(xvalues,yvalues)
-    plt.legend(currency)
+    plt.legend((currency,))
     plt.xlabel('DATE')
     plt.ylabel('EXCHANGE RATE')
     cnx.close()
@@ -266,4 +267,4 @@ def main():
                     break
 
 if __name__ == "__main__":
-    main()
+    main()  
