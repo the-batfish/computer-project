@@ -235,7 +235,9 @@ class LogInPage(ttk.Frame):
             messagebox.showerror(
                 "Error", "Invalid username/password, please check!")
         elif boolean == True:
-            self.controller.iconify()  # Minimizes root window when market is shown
+            self.controller.iconify()
+            self.username.set("")
+            self.password.set("")  # Minimizes root window when market is shown
             if self.hidden != 1:
                 Market(self, username, self.controller)
             else:
