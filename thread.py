@@ -3,7 +3,7 @@ from mysql.connector import errorcode
 from time import sleep
 import datetime
 
-currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin']
+currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin','beans']
 
 def make_connection():
     try:
