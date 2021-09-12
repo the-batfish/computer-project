@@ -23,6 +23,18 @@ def make_connection():
             print(err)
     return cnx, cnx.cursor()
 
+def del_records(currency):
+    cnx, cursor = make_connection()
+    query1 = f"SELECT COUNT(*) from {currency}"
+    cursor.execute(query1)
+    result = cursor.fetchone()[0]
+    if result > 100:
+        query2 = f"DELETE FROM {currency} ORDER BY dates DESC LIMIT {result - 100}"
+        cursor.execute(query2)
+        cnx.commit()
+    cnx.close()
+    print('done works')
+
 def exch_r8_refresh(currency):
     cnx, cursor = make_connection()
     query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY dates DESC LIMIT 1"
@@ -66,7 +78,7 @@ def exch_r8_loop():
     while True:
         for i in currencies:
             cnx, cursor = make_connection()
-            cursor.execute(f"SELECT dates FROM {i} ORDER BY dates DESC LIMIT 1")
+            cursor.execute(f"SELECT dates FROM {i} ORDER BY dates ASC LIMIT 1")
             results = cursor.fetchone()[0]
             dt = datetime.datetime.strptime(results, '%Y-%m-%d %H:%M:%S')
             if datetime.datetime.now() >= (dt + datetime.timedelta(minutes=10)):
@@ -74,6 +86,7 @@ def exch_r8_loop():
                 query = f"INSERT INTO {i}(dates, {i} , ratio) VALUES(%s,%s,%s)"
                 cursor.execute(query, (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), curr_exch_r8, ratio))
                 cnx.commit()
+                del_records(i)
                 sleep(5)
             cnx.close()
 exch_r8_loop()
