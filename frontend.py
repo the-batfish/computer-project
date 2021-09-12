@@ -582,7 +582,7 @@ class Market(tkinter.Toplevel):
         # Populating Frame
         # CryptoCoins Trading
         self.coins = ttk.Notebook(self)
-        for i in ("BotCoin", "Esterium", "BingusCoin", "FloppaCoin"):
+        for i in ("BotCoin", "Esterium", "BingusCoin", "FloppaCoin", "Beans"):
             self.coins.add(Coin(self.coins, self, self.controller,
                            self.username, i.lower()), text=i)
         self.coins.grid(row=0, column=0, sticky="NSEW")
