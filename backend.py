@@ -1,14 +1,7 @@
 import codecs
 import json
 import pickle
-import datetime
-import threading
-from time import sleep
 import matplotlib.pyplot as plt
-try:
-    import mplfinance as mpl
-except ModuleNotFoundError:
-    print("mplfinance module not found")
 import mysql.connector
 from mysql.connector import errorcode
 
