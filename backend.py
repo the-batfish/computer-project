@@ -106,7 +106,7 @@ def show_exchange_rate(currency):
 
 def balance(username):
     cnx, cursor = make_connection()
-    query = "SELECT money , botcoin , esterium , binguscoin , floppacoin FROM economy_data WHERE username = %s"
+    query = "SELECT money , botcoin , esterium , binguscoin , floppacoin , beans FROM economy_data WHERE username = %s"
     cursor.execute(query, (username,))
     results = cursor.fetchone()
     cnx.close()
