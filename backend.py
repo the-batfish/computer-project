@@ -12,7 +12,6 @@ except ModuleNotFoundError:
 import mysql.connector
 from mysql.connector import errorcode
 
-currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin']
 
 with open('data.dat','rb') as f:
     dat = pickle.load(f).replace("'",'"')
