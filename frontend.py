@@ -719,7 +719,9 @@ class Coin(ttk.Frame):
         except ValueError:
             messagebox.showwarning("Empty", "Amount Cannot be Empty")
         else:
-            if backend.buy_crypto(amount, self.username, self.coin) == True:
+            if amount==0:
+                messagebox.showwarning("Zero", "Amount Cannot be Zero")
+            elif backend.buy_crypto(amount, self.username, self.coin) == True:
                 self.toplevel.set_balance()
                 messagebox.showinfo(
                     "Sucessful", f"{amount} {self.title_labelframe['text']}s™ has been ADDED to your account!")
@@ -734,7 +736,9 @@ class Coin(ttk.Frame):
         except ValueError:
             messagebox.showwarning("Empty", "Amount Cannot be Empty")
         else:
-            if backend.sell_crypto(amount, self.username, self.coin) == True:
+            if amount==0:
+                messagebox.showwarning("Zero", "Amount Cannot be Zero")
+            elif backend.sell_crypto(amount, self.username, self.coin) == True:
                 self.toplevel.set_balance()
                 messagebox.showinfo(
                     "Sucessful", f"{amount} {self.title_labelframe['text']}s™ has been SOLD from your account!")
