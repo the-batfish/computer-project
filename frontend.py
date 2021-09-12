@@ -570,6 +570,7 @@ class Market(tkinter.Toplevel):
         self.esterium = tkinter.StringVar()
         self.binguscoin = tkinter.StringVar()
         self.floppacoin = tkinter.StringVar()
+        self.beans = tkinter.StringVar()
 
         self.set_balance()
 
@@ -592,8 +593,9 @@ class Market(tkinter.Toplevel):
         self.balance.set(f"Money: {balances[0]}")
         self.botcoin.set(f"{balances[1]} :Bot Coins")
         self.esterium.set(f"{balances[2]} :Esterium")
-        self.binguscoin.set(f" {balances[3]} :Bingus Coins")
-        self.floppacoin.set(f" {balances[4]} :Floppa Coin")
+        self.binguscoin.set(f"{balances[3]} :Bingus Coins")
+        self.floppacoin.set(f"{balances[4]} :Floppa Coin")
+        self.beans.set(f"{balances[5]} :Beans")
 
     def on_destroy(self, event):
         self.source.hidden = 0
