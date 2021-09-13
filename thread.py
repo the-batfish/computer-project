@@ -89,4 +89,6 @@ def exch_r8_loop():
                 del_records(i)
                 sleep(5)
             cnx.close()
+            if i == 'beans':
+                print('yeet')
 exch_r8_loop()
