@@ -3,4 +3,4 @@
 test_class.py
 standalone_nb.py
 pipfile.lock
-__pycache__/**
+__pycache__/
