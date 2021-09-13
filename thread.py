@@ -33,7 +33,6 @@ def del_records(currency):
         cursor.execute(query2)
         cnx.commit()
     cnx.close()
-    print('done works')
 
 def exch_r8_refresh(currency):
     cnx, cursor = make_connection()
@@ -89,6 +88,4 @@ def exch_r8_loop():
                 del_records(i)
                 sleep(5)
             cnx.close()
-            if i == 'beans':
-                print('yeet')
 exch_r8_loop()
