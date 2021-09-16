@@ -77,7 +77,7 @@ def exch_r8_loop():
     while True:
         for i in currencies:
             cnx, cursor = make_connection()
-            cursor.execute(f"SELECT dates FROM {i} ORDER BY dates ASC LIMIT 1")
+            cursor.execute(f"SELECT dates FROM {i} ORDER BY dates DESC LIMIT 1")
             results = cursor.fetchone()[0]
             dt = datetime.datetime.strptime(results, '%Y-%m-%d %H:%M:%S')
             if datetime.datetime.now() >= (dt + datetime.timedelta(minutes=10)):
