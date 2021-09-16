@@ -595,7 +595,7 @@ class Market(tkinter.Toplevel):
         self.esterium.set(f"{balances[2]} :Esterium")
         self.binguscoin.set(f"{balances[3]} :Bingus Coins")
         self.floppacoin.set(f"{balances[4]} :Floppa Coin")
-        self.floppacoin.set(f"{balances[5]} :Beans")
+        self.beans.set(f"{balances[5]} :Beans")
 
     def on_destroy(self, event):
         self.source.hidden = 0
