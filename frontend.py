@@ -170,8 +170,8 @@ class LogInPage(ttk.Frame):
 
         # Poplating Frame
         # Entry and error Lable values
-        self.username = tkinter.StringVar()
-        self.password = tkinter.StringVar()
+        self.username = tkinter.StringVar(value="Enter Username")
+        self.password = tkinter.StringVar(value="Enter Password")
         self.show = tkinter.IntVar()
 
         # Label And Entry
@@ -181,7 +181,7 @@ class LogInPage(ttk.Frame):
         self.user_label.grid(row=1, column=1, sticky="SEW", columnspan=2)
         # Username Entry
         self.user_entry = ttk.Entry(
-            self, textvariable=self.username, font=self.font_login_E)
+            self, textvariable=self.username, font=self.font_login_E, foreground="grey")
         self.user_entry.grid(row=2, column=1, sticky="NEW", columnspan=2)
 
         # Password Label
@@ -190,8 +190,14 @@ class LogInPage(ttk.Frame):
         self.pass_label.grid(row=3, column=1, sticky="SEW", columnspan=2)
         # Password Entry
         self.pass_entry = ttk.Entry(
-            self, textvariable=self.password, show="*", font=self.font_login_E)
+            self, textvariable=self.password, font=self.font_login_E, foreground="grey")
         self.pass_entry.grid(row=4, column=1, sticky="NEW", columnspan=2)
+
+        # Grey text when not focused on Entry
+        self.user_entry.bind("<FocusIn>", self.on_focusIn)
+        self.user_entry.bind("<FocusOut>", self.on_focusOut)
+        self.pass_entry.bind("<FocusIn>", self.on_focusIn)
+        self.pass_entry.bind("<FocusOut>", self.on_focusOut)
 
         # Buttons
         # Show Pass
@@ -220,6 +226,24 @@ class LogInPage(ttk.Frame):
             self.font_login_E["size"] = x//49
             # Dynamically resize fonts using Style
             self.controller.resize(event)
+
+    def on_focusIn(self, event):
+        if event.widget == self.user_entry:
+            if self.username.get() == "Enter Username":
+                self.username.set("")
+            self.user_entry.configure(foreground="black")
+        elif event.widget == self.pass_entry:
+            if self.password.get() == "Enter Password":
+                self.password.set("")
+            self.pass_entry.configure(foreground="black", show="*")
+    
+    def on_focusOut(self, event):
+        if event.widget == self.user_entry and self.username.get() == "":
+                self.username.set("Enter Username")
+                self.user_entry.configure(foreground="grey")
+        elif event.widget == self.pass_entry and self.password.get() == "":
+            self.pass_entry.configure(foreground="grey", show="")
+            self.password.set("Enter Password")
 
     # Show or hide password
     def s_or_h(self):
@@ -266,6 +290,9 @@ class RegisterPage(ttk.Frame):
 
         # Make Widget Text Resizable
         self.bind("<Configure>", self.resize)
+        # Grey text on Entry
+        self.bind_class("TEntry", "<FocusIn>", self.on_focusIn)
+        self.bind_class("TEntry", "<FocusOut>", self.on_focusOut)
 
         # Styling
         # Fonts
@@ -273,9 +300,9 @@ class RegisterPage(ttk.Frame):
 
         # Populating Frame
         # Entry and error Label values
-        self.username = tkinter.StringVar()
-        self.password = tkinter.StringVar()
-        self.confirm_pass = tkinter.StringVar()
+        self.username = tkinter.StringVar(value="Enter Username")
+        self.password = tkinter.StringVar(value="Enter Password")
+        self.confirm_pass = tkinter.StringVar(value="Enter Password")
         self.show = tkinter.IntVar()
         self.error_msg = tkinter.StringVar()
 
@@ -286,7 +313,7 @@ class RegisterPage(ttk.Frame):
         self.user_label.grid(row=3, column=2, sticky="EW", columnspan=1)
         # Username Entry
         self.user_entry = ttk.Entry(
-            self, textvariable=self.username, font=self.font_login_E)
+            self, textvariable=self.username, font=self.font_login_E, foreground="grey")
         self.user_entry.grid(row=3, column=4, sticky="EW", columnspan=1)
         # Password Label
         self.pass_label = ttk.Label(self, text="Enter Password",
@@ -294,7 +321,7 @@ class RegisterPage(ttk.Frame):
         self.pass_label.grid(row=4, column=2, sticky="EW", columnspan=1)
         # Password Entry
         self.pass_entry = ttk.Entry(
-            self, textvariable=self.password, show="*", font=self.font_login_E)
+            self, textvariable=self.password, font=self.font_login_E, foreground="grey")
         self.pass_entry.grid(row=4, column=4, sticky="EW", columnspan=1)
         # Password Label
         self.confirmPass_label = ttk.Label(
@@ -302,7 +329,7 @@ class RegisterPage(ttk.Frame):
         self.confirmPass_label.grid(row=5, column=2, sticky="EW", columnspan=1)
         # Password Entry
         self.confirmPass_entry = ttk.Entry(
-            self, textvariable=self.confirm_pass, show="*", font=self.font_login_E)
+            self, textvariable=self.confirm_pass, font=self.font_login_E, foreground="grey")
         self.confirmPass_entry.grid(row=5, column=4, sticky="EW", columnspan=1)
         # Error Label
         self.error_label = ttk.Label(
@@ -371,8 +398,33 @@ class RegisterPage(ttk.Frame):
         else:
             self.error_msg.set("")
 
-    # Show or hide password
+    def on_focusIn(self, event):
+        if event.widget == self.user_entry:
+            if self.username.get() == "Enter Username":
+                self.username.set("")
+            self.user_entry.configure(foreground="black")
+        elif event.widget == self.pass_entry:
+            if self.password.get() == "Enter Password":
+                self.password.set("")
+            self.pass_entry.configure(foreground="black", show="*")
+        elif event.widget == self.confirmPass_entry:
+            if self.confirm_pass.get() == "Enter Password":
+                self.confirm_pass.set("")
+            self.confirmPass_entry.configure(foreground="black", show="*")
+        
+    
+    def on_focusOut(self, event):
+        if event.widget == self.user_entry and self.username.get() == "":
+            self.username.set("Enter Username")
+            self.user_entry.configure(foreground="grey")
+        elif event.widget == self.pass_entry and self.password.get() == "":
+            self.pass_entry.configure(foreground="grey", show="")
+            self.password.set("Enter Password")
+        elif event.widget == self.confirmPass_entry and self.confirm_pass.get() == "":
+            self.confirmPass_entry.configure(foreground="grey", show="")
+            self.confirm_pass.set("Enter Password")
 
+    # Show or hide password
     def s_or_h(self):
         if self.show.get() == 1:
             self.pass_entry.configure(show="")
