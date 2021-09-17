@@ -5,19 +5,20 @@ import matplotlib.pyplot as plt
 import mysql.connector
 from mysql.connector import errorcode
 
-currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin']
+currencies = ["botcoin", "esterium", "binguscoin", "floppacoin"]
 
-with open('data.dat','rb') as f:
-    dat = pickle.load(f).replace("'",'"')
-    data =  json.loads(codecs.decode(dat, "rot13", "strict"))
+with open("data.dat", "rb") as f:
+    dat = pickle.load(f).replace("'", '"')
+    data = json.loads(codecs.decode(dat, "rot13", "strict"))
+
 
 def make_connection():
     try:
         cnx = mysql.connector.connect(
-            host = data['host'],
-            user=data['user'],
-            password=data['password'],
-            database=data['database']
+            host=data["host"],
+            user=data["user"],
+            password=data["password"],
+            database=data["database"],
         )
 
     except mysql.connector.Error as err:
@@ -33,7 +34,7 @@ def make_connection():
 def login_register(username, password, choice="Register"):
     if choice == "Log In":
         cnx, cursor = make_connection()
-        query = 'SELECT password from economy_data where username = %s'
+        query = "SELECT password from economy_data where username = %s"
         cursor.execute(query, (username,))
         realpass = cursor.fetchone()
         if realpass == None:
@@ -49,7 +50,9 @@ def login_register(username, password, choice="Register"):
         cnx, cursor = make_connection()
         try:
             cursor.execute(
-                'INSERT INTO economy_data(username , password) VALUES (%s , %s)', (username, password))
+                "INSERT INTO economy_data(username , password) VALUES (%s , %s)",
+                (username, password),
+            )
             cnx.commit()
             cnx.close()
             return True, username
@@ -59,11 +62,11 @@ def login_register(username, password, choice="Register"):
 
 def del_account(username, password):
     cnx, cursor = make_connection()
-    query = 'SELECT password from economy_data where username = %s'
+    query = "SELECT password from economy_data where username = %s"
     cursor.execute(query, (username,))
     truepass = cursor.fetchone()[0]
     if password == truepass:
-        query2 = 'DELETE FROM economy_data WHERE username = %s'
+        query2 = "DELETE FROM economy_data WHERE username = %s"
         cursor.execute(query2, (username,))
         cnx.commit()
         cnx.close()
@@ -72,13 +75,16 @@ def del_account(username, password):
         cnx.close()
         return False
 
+
 # this function is for displaying the current and previous exchange rates
 
 
 def show_exchange_rate(currency):
 
     cnx, cursor = make_connection()
-    cursor.execute(f'SELECT {currency} , dates FROM {currency} ORDER BY dates DESC LIMIT 10')
+    cursor.execute(
+        f"SELECT {currency} , dates FROM {currency} ORDER BY dates DESC LIMIT 10"
+    )
 
     results = cursor.fetchall()[::-1]
     xvalues1 = []
@@ -87,19 +93,20 @@ def show_exchange_rate(currency):
     for j in range(0, len(results)):
         xvalues1.append(results[j][1])
 
-    for b in range(len(xvalues1) - 10 , len(xvalues1)):
+    for b in range(len(xvalues1) - 10, len(xvalues1)):
         xvalues.append(xvalues1[b][5:16])
 
     for k in range(0, len(results)):
         yvalues.append(results[k][0])
 
-    plt.xticks(rotation = 45)
-    plt.plot(xvalues,yvalues)
+    plt.xticks(rotation=45)
+    plt.plot(xvalues, yvalues)
     plt.legend((currency,))
-    plt.xlabel('DATE')
-    plt.ylabel('EXCHANGE RATE')
+    plt.xlabel("DATE")
+    plt.ylabel("EXCHANGE RATE")
     cnx.close()
     plt.show()
+
 
 # this function is for showing the balance in your account
 
@@ -112,16 +119,17 @@ def balance(username):
     cnx.close()
     return results
 
+
 # this function is for obtaining the current exchange rate for buying and selling
 
 
 def exchange_rate(currency):
     cnx, cursor = make_connection()
-    cursor.execute(
-        f'SELECT {currency} FROM {currency} ORDER BY dates DESC LIMIT 1')
+    cursor.execute(f"SELECT {currency} FROM {currency} ORDER BY dates DESC LIMIT 1")
     result = cursor.fetchone()[0]
     cnx.close()
     return result
+
 
 # this function is for buying crypto
 
@@ -139,7 +147,9 @@ def buy_crypto(num, username, currency):
     if cost <= available_money:
         new_balance = available_money - cost
         new_crypto_balance = available_crypto + num
-        command = f"UPDATE economy_data SET {currency} = %s , money = %s WHERE username = %s"
+        command = (
+            f"UPDATE economy_data SET {currency} = %s , money = %s WHERE username = %s"
+        )
         values = (new_crypto_balance, new_balance, username)
         cursor.execute(command, values)
         cnx.commit()
@@ -148,10 +158,13 @@ def buy_crypto(num, username, currency):
     else:
         return False
 
+
 # this function is for buying crypto
 
 
-def sell_crypto(num, username, currency):  # here num is the number of cryptos being sold
+def sell_crypto(
+    num, username, currency
+):  # here num is the number of cryptos being sold
     cnx, cursor = make_connection()
     exch = exchange_rate(currency)
     sale = num * exch
@@ -163,7 +176,9 @@ def sell_crypto(num, username, currency):  # here num is the number of cryptos b
     if num <= available_crypto:
         new_balance = available_money + sale
         new_crypto_balance = available_crypto - num
-        command = f"UPDATE economy_data SET {currency} = %s , money = %s WHERE username = %s"
+        command = (
+            f"UPDATE economy_data SET {currency} = %s , money = %s WHERE username = %s"
+        )
         values = (new_crypto_balance, new_balance, username)
         cursor.execute(command, values)
         cnx.commit()
@@ -173,91 +188,102 @@ def sell_crypto(num, username, currency):  # here num is the number of cryptos b
         cnx.close()
         return False
 
+
 def main():
-    username = input('Enter the username: ')
-    password = input('Enter the password: ')
-    a, username = login_register(username,password,"Log In")
+    username = input("Enter the username: ")
+    password = input("Enter the password: ")
+    a, username = login_register(username, password, "Log In")
     if a == True:
         while True:
-            print('''
+            print(
+                """
         1. Balance
         2. Show Exchange Rate
         3. Buy Crypto
         4. Sell Crypto
         5. Delete account
         0. Exit
-        ''')
-            choice = int(input('Enter your choice: '))
+        """
+            )
+            choice = int(input("Enter your choice: "))
             if choice == 0:
                 break
             elif choice == 1:
                 balance(username)
             elif choice == 2:
-                show_exchange_rate('botcoin')
+                show_exchange_rate("botcoin")
             elif choice == 3:
                 while True:
-                    cryptochoice1 = int(input('''
+                    cryptochoice1 = int(
+                        input(
+                            """
                     1. botcoin
                     2. esterium
                     3. binguscoin
                     4. floppacoin
                     enter your choice of cryptocurrency here: 
-                    '''))
+                    """
+                        )
+                    )
                     if cryptochoice1 == 1:
-                        crypto1 = 'botcoin'
+                        crypto1 = "botcoin"
                         break
                     elif cryptochoice1 == 2:
-                        crypto1 = 'esterium'
+                        crypto1 = "esterium"
                         break
                     elif cryptochoice1 == 3:
-                        crypto1 = 'binguscoin'
+                        crypto1 = "binguscoin"
                         break
                     elif cryptochoice1 == 4:
-                        crypto1 = 'floppacoin'
+                        crypto1 = "floppacoin"
                         break
                     else:
-                        print('Enter a valid option!')
+                        print("Enter a valid option!")
 
-                buy_amount = int(
-                    input('Enter the number of cryptos you want to buy: '))
+                buy_amount = int(input("Enter the number of cryptos you want to buy: "))
                 if buy_amount > 0:
                     buy_crypto(buy_amount, username, crypto1)
                 else:
-                    print('Enter a proper value!')
+                    print("Enter a proper value!")
             elif choice == 4:
                 while True:
-                    cryptochoice2 = int(input('''
+                    cryptochoice2 = int(
+                        input(
+                            """
                     1. botcoin
                     2. esterium
                     3. binguscoin
                     4. floppacoin
-                    enter your choice of cryptocurrency here: '''
-                                            ))
+                    enter your choice of cryptocurrency here: """
+                        )
+                    )
                     if cryptochoice2 == 1:
-                        crypto2 = 'botcoin'
+                        crypto2 = "botcoin"
                         break
                     elif cryptochoice2 == 2:
-                        crypto2 = 'esterium'
+                        crypto2 = "esterium"
                         break
                     elif cryptochoice2 == 3:
-                        crypto2 = 'binguscoin'
+                        crypto2 = "binguscoin"
                         break
                     elif cryptochoice2 == 4:
-                        crypto2 = 'floppacoin'
+                        crypto2 = "floppacoin"
                         break
                     else:
-                        print('Enter a valid option!')
+                        print("Enter a valid option!")
 
                 sell_amount = int(
-                    input('Enter the number of cryptos you want to sell: '))
+                    input("Enter the number of cryptos you want to sell: ")
+                )
 
                 if sell_amount > 0:
                     sell_crypto(sell_amount, username, crypto2)
                 else:
-                    print('Enter a proper value!')
+                    print("Enter a proper value!")
             elif choice == 5:
                 if del_account(username) == True:
                     break
 
+
 if __name__ == "__main__":
-    main()  
+    main()

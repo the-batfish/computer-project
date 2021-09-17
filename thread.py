@@ -3,15 +3,16 @@ from mysql.connector import errorcode
 from time import sleep
 import datetime
 
-currencies = ['botcoin', 'esterium', 'binguscoin', 'floppacoin','beans']
+currencies = ["botcoin", "esterium", "binguscoin", "floppacoin", "beans"]
+
 
 def make_connection():
     try:
         cnx = mysql.connector.connect(
-            host ='blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com',
-            user='uf7gxtzihchkojup',
-            password='K1bhziQq9KnSPAVSnFdH',
-            database='blsuvxgq3bvwh8qw4ah7'
+            host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
+            user="uf7gxtzihchkojup",
+            password="K1bhziQq9KnSPAVSnFdH",
+            database="blsuvxgq3bvwh8qw4ah7",
         )
 
     except mysql.connector.Error as err:
@@ -23,6 +24,7 @@ def make_connection():
             print(err)
     return cnx, cnx.cursor()
 
+
 def del_records(currency):
     cnx, cursor = make_connection()
     query1 = f"SELECT COUNT(*) from {currency}"
@@ -33,6 +35,7 @@ def del_records(currency):
         cursor.execute(query2)
         cnx.commit()
     cnx.close()
+
 
 def exch_r8_refresh(currency):
     cnx, cursor = make_connection()
@@ -49,7 +52,7 @@ def exch_r8_refresh(currency):
     for i in cursor.fetchall():
         tot_crypto += i[0]
         n1 += 1
-    avg_crypto = tot_crypto/n1
+    avg_crypto = tot_crypto / n1
 
     query3 = "SELECT money FROM economy_data"
     cursor.execute(query3)
@@ -58,17 +61,17 @@ def exch_r8_refresh(currency):
     for i in cursor.fetchall():
         tot_money += i[0]
         n2 += 1
-    avg_money = tot_money/n2
+    avg_money = tot_money / n2
     if avg_money == 0:
         avg_money = 1
 
-    ratio = round(avg_crypto/avg_money, 2)
+    ratio = round(avg_crypto / avg_money, 2)
     if ratio == curr_ratio:
         new_exch_r8 = curr_exch_r8
-    elif round(curr_exch_r8*ratio) <= 1:
+    elif round(curr_exch_r8 * ratio) <= 1:
         new_exch_r8 = 1
     else:
-        new_exch_r8 = round(curr_exch_r8*ratio)
+        new_exch_r8 = round(curr_exch_r8 * ratio)
     cnx.close()
     return new_exch_r8, ratio
 
@@ -76,18 +79,27 @@ def exch_r8_refresh(currency):
 def exch_r8_loop():
     while True:
         for i in currencies:
-            if i == 'beans':
-                print('coming')
+            if i == "beans":
+                print("coming")
             cnx, cursor = make_connection()
             cursor.execute(f"SELECT dates FROM {i} ORDER BY dates DESC LIMIT 1")
             results = cursor.fetchone()[0]
-            dt = datetime.datetime.strptime(results, '%Y-%m-%d %H:%M:%S')
+            dt = datetime.datetime.strptime(results, "%Y-%m-%d %H:%M:%S")
             if datetime.datetime.now() >= (dt + datetime.timedelta(seconds=600)):
                 curr_exch_r8, ratio = exch_r8_refresh(i)
                 query = f"INSERT INTO {i}(dates, {i} , ratio) VALUES(%s,%s,%s)"
-                cursor.execute(query, (datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), curr_exch_r8, ratio))
+                cursor.execute(
+                    query,
+                    (
+                        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        curr_exch_r8,
+                        ratio,
+                    ),
+                )
                 cnx.commit()
                 del_records(i)
                 sleep(5)
             cnx.close()
+
+
 exch_r8_loop()
