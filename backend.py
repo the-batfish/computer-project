@@ -15,6 +15,8 @@ with open("data.dat", "rb") as f:
 def make_connection():
     try:
         cnx = mysql.connector.connect(
+            pool_name="mypool",
+            pool_size=2,
             host=data["host"],
             user=data["user"],
             password=data["password"],
@@ -156,6 +158,7 @@ def buy_crypto(num, username, currency):
         cnx.close()
         return True
     else:
+        cnx.close()
         return False
 
 
