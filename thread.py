@@ -69,6 +69,8 @@ def exch_r8_refresh(currency):
         avg_money = 1
 
     ratio = round(avg_crypto / avg_money, 2)
+    if ratio > 5.00:
+        ratio = 5.00
     if Decimal(curr_ratio) == Decimal(ratio):
         return curr_exch_r8, curr_ratio
         
