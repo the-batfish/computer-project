@@ -866,11 +866,11 @@ class Coin(ttk.Frame):
 
         # Money Label
         self.money_label = ttk.Label(
-            self.title_labelframe,
+            self,
             textvariable=self.toplevel.balance,
             style="small.TLabel",
         )
-        self.money_label.grid(row=0, column=0, sticky="NSW")
+        self.money_label.grid(row=0, column=1, sticky="NSW")
 
         # Log Out Button
         self.logOut_button = ttk.Button(
@@ -883,11 +883,11 @@ class Coin(ttk.Frame):
 
         # Crypto Label
         self.crypto_label = ttk.Label(
-            self.title_labelframe,
+            self,
             textvariable=eval(f"self.toplevel.{self.coin}"),
             style="small.TLabel",
         )
-        self.crypto_label.grid(row=0, column=2, sticky="NSE")
+        self.crypto_label.grid(row=0, column=3, sticky="NSE")
 
         # Populating Main Frame
         # Image Label
