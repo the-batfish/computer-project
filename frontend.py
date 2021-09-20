@@ -48,6 +48,9 @@ class App(tkinter.Tk):
         container.rowconfigure(0, weight=1)
         container.columnconfigure(0, weight=1)
 
+        #To stop another user from being logged in
+        self.logged_in = 0
+
         self.frames = {}
 
         for F in (HomePage, LogInPage, RegisterPage, DeletePage):
@@ -143,7 +146,7 @@ class HomePage(ttk.Frame):
     # Dynamically resize fonts and pics
     def resize(self, event):
         # Check if frame is visible
-        if self.hidden == 0:
+        if self.hidden == 0 and self.controller.logged_in == 0:
             # Keeping picture aspect ratio same when resizing
             ratio = self.image_size[0] / self.image_size[1]
             width = event.height / 1.5
@@ -253,7 +256,7 @@ class LogInPage(ttk.Frame):
     # Dynamically resize font
     def resize(self, event):
         # Check if frame is visible
-        if self.hidden == 0:
+        if self.hidden == 0 and self.controller.logged_in == 0:
             # Dynamically resize entry since ttk.Entry does not accept Styles
             x = event.height if event.height > event.width else event.width
             self.font_login_E["size"] = x // 49
@@ -297,7 +300,7 @@ class LogInPage(ttk.Frame):
             self.controller.iconify()
             self.username.set("")
             self.password.set("")  # Minimizes root window when market is shown
-            if self.hidden != 1:
+            if self.controller.logged_in != 1:
                 Market(self, username, self.controller)
             else:
                 messagebox.showwarning(
@@ -439,7 +442,7 @@ class RegisterPage(ttk.Frame):
     # Dynamically resize font
     def resize(self, event):
         # Check if frame is visible
-        if self.hidden == 0:
+        if self.hidden == 0 and self.controller.logged_in == 0:
             # Dynamically resize entry since ttk.Entry does not accept Styles
             x = event.height if event.height > event.width else event.width
             self.font_login_E["size"] = x // 49
@@ -528,7 +531,7 @@ class RegisterPage(ttk.Frame):
                 self.username.set("")
                 self.password.set("")
                 self.confirm_pass.set("")
-                if self.hidden != 1:
+                if self.controller.logged_in != 1:
                     Market(self, username, self.controller)
                 else:
                     messagebox.showwarning(
@@ -678,7 +681,7 @@ class DeletePage(ttk.Frame):
     # Dynamically resize font
     def resize(self, event):
         # Check if frame is visible
-        if self.hidden == 0:
+        if self.hidden == 0 and self.controller.logged_in == 0:
             # Dynamically resize entry since ttk.Entry does not accept Styles
             x = event.height if event.height > event.width else event.width
             self.font_login_E["size"] = x // 49
@@ -768,8 +771,8 @@ class Market(tkinter.Toplevel):
         self.username = username
         self.source = source
 
-        # Stop Source Window which made toplevel window from passing values to resize in controller
-        self.source.hidden = 1
+        # To Stop Another User From being Logged In
+        self.controller.logged_in = 1
 
         # Initializing Values
         self.balance = tkinter.StringVar()
@@ -808,7 +811,7 @@ class Market(tkinter.Toplevel):
 
     def on_destroy(self, event):
         if event.widget == self:
-            self.source.hidden = 0
+            self.controller.logged_in = 0
             self.controller.geometry(f"{self.controller.winfo_width()+1}x{self.controller.winfo_height()+1}")
             self.controller.deiconify()
 
