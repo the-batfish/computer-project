@@ -10,6 +10,8 @@ currencies = ["botcoin", "esterium", "binguscoin", "floppacoin", "beans"]
 def make_connection():
     try:
         cnx = mysql.connector.connect(
+            pool_name="mypool",
+            pool_size=2,
             host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
             user="uf7gxtzihchkojup",
             password="K1bhziQq9KnSPAVSnFdH",
