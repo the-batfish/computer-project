@@ -8,19 +8,15 @@ from mysql.connector import errorcode
 currencies = ["botcoin", "esterium", "binguscoin", "floppacoin"]
 
 with open("data.dat", "rb") as f:
-    dat = pickle.load(f).replace("'", '"')
-    data = json.loads(codecs.decode(dat, "rot13", "strict"))
-
+    data = pickle.load(f).replace("'", '"')
+    dbconfig = json.loads(codecs.decode(dat, "rot13", "strict"))
 
 def make_connection():
     try:
         cnx = mysql.connector.connect(
             pool_name="mypool",
             pool_size=2,
-            host=data["host"],
-            user=data["user"],
-            password=data["password"],
-            database=data["database"],
+            **dbconfig
         )
 
     except mysql.connector.Error as err:
