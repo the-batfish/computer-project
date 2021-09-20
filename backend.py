@@ -9,7 +9,7 @@ currencies = ["botcoin", "esterium", "binguscoin", "floppacoin"]
 
 with open("data.dat", "rb") as f:
     data = pickle.load(f).replace("'", '"')
-    dbconfig = json.loads(codecs.decode(dat, "rot13", "strict"))
+    dbconfig = json.loads(codecs.decode(data, "rot13", "strict"))
 
 def make_connection():
     try:
