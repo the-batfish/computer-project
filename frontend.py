@@ -87,8 +87,8 @@ class App(tkinter.Tk):
 
 
 class HomePage(ttk.Frame):
-    def __init__(self, master, controller):
-        super().__init__(master)
+    def __init__(self, parent, controller):
+        super().__init__(parent)
         # App aka tk.TK()
         self.controller = controller
 
@@ -161,8 +161,8 @@ class HomePage(ttk.Frame):
 
 
 class LogInPage(ttk.Frame):
-    def __init__(self, master, controller):
-        super().__init__(master)
+    def __init__(self, parent, controller):
+        super().__init__(parent)
         # App aka tk.TK()
         self.controller = controller
 
@@ -309,8 +309,8 @@ class LogInPage(ttk.Frame):
 
 
 class RegisterPage(ttk.Frame):
-    def __init__(self, master, controller):
-        super().__init__(master)
+    def __init__(self, parent, controller):
+        super().__init__(parent)
         # App aka tk.TK()
         self.controller = controller
 
@@ -545,8 +545,8 @@ class RegisterPage(ttk.Frame):
 
 
 class DeletePage(ttk.Frame):
-    def __init__(self, master, controller):
-        super().__init__(master)
+    def __init__(self, parent, controller):
+        super().__init__(parent)
         # App aka tk.TK()
         self.controller = controller
 
@@ -817,8 +817,8 @@ class Market(tkinter.Toplevel):
 
 
 class Coin(ttk.Frame):
-    def __init__(self, master, toplevel, controller, username, coin):
-        super().__init__(master)
+    def __init__(self, parent, toplevel, controller, username, coin):
+        super().__init__(parent)
 
         self.toplevel = toplevel
         self.controller = controller
