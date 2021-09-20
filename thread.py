@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector import errorcode
 from time import sleep
 import datetime
+from decimal import Decimal
 
 currencies = ["botcoin", "esterium", "binguscoin", "floppacoin", "beans"]
 
@@ -9,6 +10,8 @@ currencies = ["botcoin", "esterium", "binguscoin", "floppacoin", "beans"]
 def make_connection():
     try:
         cnx = mysql.connector.connect(
+            pool_name="mypool",
+            pool_size=2,
             host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
             user="uf7gxtzihchkojup",
             password="K1bhziQq9KnSPAVSnFdH",
@@ -66,7 +69,7 @@ def exch_r8_refresh(currency):
         avg_money = 1
 
     ratio = round(avg_crypto / avg_money, 2)
-    if ratio == curr_ratio:
+    if Decimal(curr_ratio) == Decimal(ratio):
         return curr_exch_r8, curr_ratio
         
     elif round(curr_exch_r8 * ratio) <= 1:
