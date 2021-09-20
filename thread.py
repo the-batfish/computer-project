@@ -67,14 +67,9 @@ def exch_r8_refresh(currency):
 
     ratio = round(avg_crypto / avg_money, 2)
     if ratio == curr_ratio:
-        return curr_exch_r8, curr_ratio
-        
+        new_exch_r8 = curr_exch_r8
     elif round(curr_exch_r8 * ratio) <= 1:
         new_exch_r8 = 1
-    
-    elif round(curr_exch_r8 * ratio) >= 9223372036854775807:
-        new_exch_r8 = 9223372036854775807
-
     else:
         new_exch_r8 = round(curr_exch_r8 * ratio)
     cnx.close()

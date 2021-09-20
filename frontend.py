@@ -62,6 +62,7 @@ class App(tkinter.Tk):
         frame = self.frames[cont]
         # Sets hidden to 0 since frame is visible
         frame.hidden = 0
+        self.geometry(f"{self.winfo_width()+1}x{self.winfo_height()+1}")
         frame.tkraise()
         # Sets hidden of all other frames 0 since the frames are hidden
         for i in self.frames:
@@ -167,7 +168,7 @@ class LogInPage(ttk.Frame):
             self.rowconfigure(i, weight=9)
         for i in range(1, 8):
             self.rowconfigure(i, weight=1)
-        for i in range(5):
+        for i in range(4):
             self.columnconfigure(i, weight=1)
 
         # To check if frame is behind another frame
@@ -807,6 +808,7 @@ class Market(tkinter.Toplevel):
 
     def on_destroy(self, event):
         self.source.hidden = 0
+        self.controller.geometry(f"{self.controller.winfo_width()+1}x{self.controller.winfo_height()+1}")
         self.controller.deiconify()
 
 
