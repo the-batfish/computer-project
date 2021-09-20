@@ -807,9 +807,10 @@ class Market(tkinter.Toplevel):
         self.beans.set(f"{balances[5]} :Beans")
 
     def on_destroy(self, event):
-        self.source.hidden = 0
-        self.controller.geometry(f"{self.controller.winfo_width()+1}x{self.controller.winfo_height()+1}")
-        self.controller.deiconify()
+        if event.widget == self:
+            self.source.hidden = 0
+            self.controller.geometry(f"{self.controller.winfo_width()+1}x{self.controller.winfo_height()+1}")
+            self.controller.deiconify()
 
 
 class Coin(ttk.Frame):
