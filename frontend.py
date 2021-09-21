@@ -835,8 +835,9 @@ class Coin(ttk.Frame):
         # Configuring Rows and Columns
         for i in range(5):
             self.columnconfigure(i, weight=1)
-        for i in range(8):
-            self.rowconfigure(i, weight=1)
+        self.rowconfigure(0, weight=1)
+        for i in range(1,11):
+            self.rowconfigure(i, weight=4)
 
         # Make Widget Text Resizable
         self.bind("<Configure>", self.resize)
@@ -849,95 +850,98 @@ class Coin(ttk.Frame):
 
         # Validation for Coin Entry
         vcmd = (self.controller.register(self.intValidate), "%S")
-
-        # Balance and Logout Frame
-        self.title_labelframe = ttk.LabelFrame(
-            self,
-            text="".join([" " + i if i == "C" else i for i in self.coin.upper()]),
-            borderwidth=0,
-            labelanchor="s",
-        )
-        self.title_labelframe.grid(row=0, column=0, columnspan=5, sticky="NSEW")
-
-        # Configuring Rows and Columns
-        for i in range(3):
-            self.title_labelframe.columnconfigure(i, weight=1)
-        self.title_labelframe.rowconfigure(0, weight=1)
-
-        # Money Label
-        self.money_label = ttk.Label(
-            self,
-            textvariable=self.toplevel.balance,
-            style="small.TLabel",
-        )
-        self.money_label.grid(row=0, column=1, sticky="NSW")
-
+       
+        # Populating Main Frame
         # Log Out Button
         self.logOut_button = ttk.Button(
-            self.title_labelframe,
+            self,
             text="Log Out",
             style="small.TButton",
-            command=self.toplevel.destroy,
+            command=self.toplevel.destroy
         )
-        self.logOut_button.grid(row=0, column=1, sticky="NSEW")
+        self.logOut_button.grid(row=0, column=2, sticky="NSEW")
+
+        # Coin Name Frame
+        self.title_labelframe = tkinter.LabelFrame(
+            self,
+            text="".join([" " + i if i == "C" else i for i in self.coin.upper()]),
+            labelanchor="n"
+        )
+        self.title_labelframe.grid(row=1, column=0, rowspan=10, columnspan=5, sticky="NSEW")
+
+        # Configuring Rows and Columns
+        for i in range(5):
+            self.title_labelframe.columnconfigure(i, weight=1)
+        for i in range(10):
+            self.title_labelframe.rowconfigure(i, weight=1)
+
+        # Populating Coin Name LabelFrame
+        # Money Label
+        self.money_label = ttk.Label(
+            self.title_labelframe,
+            textvariable=self.toplevel.balance,
+            style="small.TLabel",
+            anchor="nw"
+        )
+        self.money_label.grid(row=1, column=1, sticky="NSEW")
 
         # Crypto Label
         self.crypto_label = ttk.Label(
-            self,
+            self.title_labelframe,
             textvariable=eval(f"self.toplevel.{self.coin}"),
             style="small.TLabel",
+            anchor="ne"
         )
-        self.crypto_label.grid(row=0, column=3, sticky="NSE")
+        self.crypto_label.grid(row=1, column=3, sticky="NSEW")
 
-        # Populating Main Frame
         # Image Label
-        self.img_label = ttk.Label(self, image=self.logo)
-        self.img_label.grid(row=1, column=2)
+        self.img_label = ttk.Label(self.title_labelframe, image=self.logo)
+        self.img_label.grid(row=2, column=2)
 
         # Coin Amount Entry
         self.coinAmount_entry = ttk.Entry(
-            self,
+            self.title_labelframe,
             textvariable=self.coinAmount,
             font=self.coin_font,
             justify="center",
             validate="key",
             validatecommand=vcmd,
         )
-        self.coinAmount_entry.grid(row=3, column=2, sticky="NSEW")
+        self.coinAmount_entry.grid(row=4, column=2, sticky="NSEW")
 
         # Add Coins Button
         self.remove_button = ttk.Button(
-            self, text="-", style="big.TButton", command=self.decrease_Amount
+            self.title_labelframe, text="-", style="big.TButton", command=self.decrease_Amount
         )
-        self.remove_button.grid(row=3, column=1, sticky="NSEW")
+        self.remove_button.grid(row=4, column=1, sticky="NSEW")
         # Remove Coins Button
         self.add_button = ttk.Button(
-            self, text="+", style="big.TButton", command=self.increase_Amount
+            self.title_labelframe, text="+", style="big.TButton", command=self.increase_Amount
         )
-        self.add_button.grid(row=3, column=3, sticky="NSEW")
+        self.add_button.grid(row=4, column=3, sticky="NSEW")
 
         # Buy Button
         self.buy_button = ttk.Button(
-            self, text="BUY", style="big.TButton", command=lambda: self.buy()
+            self.title_labelframe, text="BUY", style="big.TButton", command=lambda: self.buy()
         )
         self.buy_button.grid(
-            row=4,
+            row=5,
             column=2,
-            sticky="NSEW",
+            sticky="SEW",
         )
         # Sell Button
         self.sell_button = ttk.Button(
-            self, text="SELL", style="big.TButton", command=lambda: self.sell()
+            self.title_labelframe, text="SELL", style="big.TButton", command=lambda: self.sell()
         )
-        self.sell_button.grid(row=5, column=2, sticky="NSEW")
+        self.sell_button.grid(row=6, column=2, sticky="NEW")
         # Show Line Graph
         self.graph_button = ttk.Button(
-            self,
+            self.title_labelframe,
             text="Show Stock Graph",
             command=lambda: backend.show_exchange_rate(self.coin),
-            style="big.TButton",
+            style="big.TButton"
         )
-        self.graph_button.grid(row=7, column=2, sticky="NSEW")
+        self.graph_button.grid(row=8, column=2, sticky="NSEW")
 
     def increase_Amount(self, event=None):
         amount = self.coinAmount.get()
@@ -1009,7 +1013,7 @@ class Coin(ttk.Frame):
             )
         self.img_label.configure(image=self.logo)
         # Change entry font size
-        self.coin_font["size"] = x // 25
+        self.coin_font["size"] = x // 36
         # Change Every Other Font Size
         self.controller.resize(event)
 
