@@ -4,6 +4,7 @@ import pickle
 import matplotlib.pyplot as plt
 import mysql.connector
 from mysql.connector import errorcode
+import datetime
 
 currencies = ["botcoin", "esterium", "binguscoin", "floppacoin"]
 
@@ -187,6 +188,13 @@ def sell_crypto(
         cnx.close()
         return False
 
+#for showing the next reset timer
+def exch_time(currency):
+    cnx, cursor = make_connection()
+    cursor.execute(f"SELECT dates FROM {currency} ORDER BY dates DESC LIMIT 1")
+    result = cursor.fetchone()[0] + datetime.timedelta(minutes = 10) + datetime.timedelta(seconds = 3)
+    cnx.close()
+    return result
 
 def main():
     username = input("Enter the username: ")
