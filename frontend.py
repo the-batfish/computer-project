@@ -862,7 +862,7 @@ class Coin(ttk.Frame):
         self.logOut_button.grid(row=0, column=2, sticky="NSEW")
 
         # Coin Name Frame
-        self.title_labelframe = tkinter.LabelFrame(
+        self.title_labelframe = ttk.LabelFrame(
             self,
             text="".join([" " + i if i == "C" else i for i in self.coin.upper()]),
             labelanchor="n"
