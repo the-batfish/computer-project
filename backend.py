@@ -192,9 +192,11 @@ def sell_crypto(
 def exch_time(currency):
     cnx, cursor = make_connection()
     cursor.execute(f"SELECT dates FROM {currency} ORDER BY dates DESC LIMIT 1")
-    result = cursor.fetchone()[0] + datetime.timedelta(minutes = 10)
+    result = cursor.fetchone()[0]
+    dt = datetime.datetime.strptime(result, "%Y-%m-%d %H:%M:%S")
+    result1 = dt + datetime.timedelta(minutes = 10)
     cnx.close()
-    return result
+    return result1
 
 def main():
     username = input("Enter the username: ")
