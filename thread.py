@@ -111,6 +111,5 @@ def exch_r8_loop():
                 cnx.close()
             else:
                 cnx.close()
-                sleep(5)
-                
+                sleep(1)
 exch_r8_loop()
