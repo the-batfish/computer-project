@@ -108,8 +108,9 @@ def exch_r8_loop():
                 )
                 cnx.commit()
                 del_records(i)
+                cnx.close()
+            else:
+                cnx.close()
                 sleep(5)
-            cnx.close()
-
-
+                
 exch_r8_loop()
