@@ -95,13 +95,13 @@ def exch_r8_loop():
             cursor.execute(f"SELECT dates FROM {i} ORDER BY dates DESC LIMIT 1")
             results = cursor.fetchone()[0]
             dt = datetime.datetime.strptime(results, "%Y-%m-%d %H:%M:%S")
-            if datetime.datetime.now() >= (dt + datetime.timedelta(seconds=600)):
+            if datetime.datetime.utcnow() >= (dt + datetime.timedelta(seconds=600)):
                 curr_exch_r8, ratio = exch_r8_refresh(i)
                 query = f"INSERT INTO {i}(dates, {i} , ratio) VALUES(%s,%s,%s)"
                 cursor.execute(
                     query,
                     (
-                        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
                         curr_exch_r8,
                         ratio,
                     ),
