@@ -11,7 +11,7 @@ def make_connection():
     try:
         cnx = mysql.connector.connect(
             pool_name="mypool",
-            pool_size=2,
+            pool_size=1,
             host="blsuvxgq3bvwh8qw4ah7-mysql.services.clever-cloud.com",
             user="uf7gxtzihchkojup",
             password="K1bhziQq9KnSPAVSnFdH",
@@ -28,8 +28,7 @@ def make_connection():
     return cnx, cnx.cursor()
 
 
-def del_records(currency):
-    cnx, cursor = make_connection()
+def del_records(currency, cnx, cursor):
     query1 = f"SELECT COUNT(*) from {currency}"
     cursor.execute(query1)
     result = cursor.fetchone()[0]
@@ -37,11 +36,9 @@ def del_records(currency):
         query2 = f"DELETE FROM {currency} ORDER BY dates ASC LIMIT {result - 50}"
         cursor.execute(query2)
         cnx.commit()
-    cnx.close()
 
 
-def exch_r8_refresh(currency):
-    cnx, cursor = make_connection()
+def exch_r8_refresh(currency, cnx, cursor):
     query1 = f"SELECT {currency} , ratio FROM {currency} ORDER BY dates DESC LIMIT 1"
     cursor.execute(query1)
     results = cursor.fetchone()
@@ -82,7 +79,6 @@ def exch_r8_refresh(currency):
 
     else:
         new_exch_r8 = round(curr_exch_r8 * ratio)
-    cnx.close()
     return new_exch_r8, ratio
 
 
@@ -95,7 +91,7 @@ def exch_r8_loop():
             dt = datetime.datetime.strptime(results, "%Y-%m-%d %H:%M:%S")
             print(i, dt)
             if datetime.datetime.utcnow() >= (dt + datetime.timedelta(seconds=600)):
-                curr_exch_r8, ratio = exch_r8_refresh(i)
+                curr_exch_r8, ratio = exch_r8_refresh(i, cnx, cursor)
                 print(curr_exch_r8, ratio)
                 query = f"INSERT INTO {i}(dates, {i} , ratio) VALUES(%s,%s,%s)"
                 cursor.execute(
@@ -107,7 +103,7 @@ def exch_r8_loop():
                     ),
                 )
                 cnx.commit()
-                del_records(i)
+                del_records(i, cnx, cursor)
                 cnx.close()
             else:
                 cnx.close()
