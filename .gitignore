@@ -2,5 +2,4 @@
 .python-version
 test_class.py
 standalone_nb.py
-pipfile.lock
 __pycache__/
