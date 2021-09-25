@@ -188,15 +188,17 @@ def sell_crypto(
         cnx.close()
         return False
 
-#for showing the next reset timer
-def exch_time(currency):
+# for calculating time until next reset
+def refresh_time(currency):
     cnx, cursor = make_connection()
     cursor.execute(f"SELECT dates FROM {currency} ORDER BY dates DESC LIMIT 1")
     result = cursor.fetchone()[0]
-    dt = datetime.datetime.strptime(result, "%Y-%m-%d %H:%M:%S")
-    result1 = dt + datetime.timedelta(minutes = 10)
+    past = datetime.datetime.strptime(result, "%Y-%m-%d %H:%M:%S")
+    future = past + datetime.timedelta(minutes = 10)
     cnx.close()
-    return result1
+    time_left = future - datetime.datetime.utcnow()
+    print(time_left)
+    return time_left
 
 def main():
     username = input("Enter the username: ")
