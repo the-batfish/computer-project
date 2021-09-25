@@ -89,14 +89,14 @@ def exch_r8_refresh(currency):
 def exch_r8_loop():
     while True:
         for i in currencies:
-            if i == "beans":
-                print("coming")
             cnx, cursor = make_connection()
             cursor.execute(f"SELECT dates FROM {i} ORDER BY dates DESC LIMIT 1")
             results = cursor.fetchone()[0]
             dt = datetime.datetime.strptime(results, "%Y-%m-%d %H:%M:%S")
+            print(i, dt)
             if datetime.datetime.utcnow() >= (dt + datetime.timedelta(seconds=600)):
                 curr_exch_r8, ratio = exch_r8_refresh(i)
+                print(curr_exch_r8, ratio)
                 query = f"INSERT INTO {i}(dates, {i} , ratio) VALUES(%s,%s,%s)"
                 cursor.execute(
                     query,
