@@ -1,12 +1,16 @@
+import datetime
+import threading
+from time import sleep
+
 import tkinter
 from tkinter import font, messagebox, ttk
-
-from PIL import Image, ImageOps, ImageTk
+from mttkinter import mtTkinter
+from PIL import Image, ImageTk, ImageOps
 
 import backend
 
 
-class App(tkinter.Tk):
+class App(mtTkinter.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -782,6 +786,15 @@ class Market(tkinter.Toplevel):
         self.floppacoin = tkinter.StringVar()
         self.beans = tkinter.StringVar()
 
+         # Timer Values
+        self.rateTime = backend.refresh_time() + datetime.timedelta(seconds=5)
+        self.rateTimeDisplay = tkinter.StringVar(
+            value=f"{(self.rateTime.seconds% 3600)//60}:{self.rateTime.seconds%60} Until Exchange Rate Changes"
+        )
+
+        # Starting Excahnge Rate Timer
+        self.start_timer()
+
         self.set_balance()
 
         self.rowconfigure(0, weight=1)
@@ -802,12 +815,26 @@ class Market(tkinter.Toplevel):
 
     def set_balance(self):
         balances = backend.balance(self.username)
-        self.balance.set(f"Money: {balances[0]}")
+        self.balance.set(f"Dollars: {balances[0]}")
         self.botcoin.set(f"{balances[1]} :Bot Coins")
         self.esterium.set(f"{balances[2]} :Esterium")
         self.binguscoin.set(f"{balances[3]} :Bingus Coins")
         self.floppacoin.set(f"{balances[4]} :Floppa Coin")
         self.beans.set(f"{balances[5]} :Beans")
+
+    def timer(self):
+        while True:
+            if self.rateTime <= datetime.timedelta(seconds=0):
+                self.rateTime = self.rateTime = backend.refresh_time() + datetime.timedelta(seconds=5)
+                for i in self.coins.tabs():
+                    self.coins.nametowidget(i).rate.set(f"Current Exchange Rate: {backend.exchange_rate(self.coins.nametowidget(i).coin)}")
+            else:
+                sleep(1)
+                self.rateTime -= datetime.timedelta(seconds=1)
+            self.rateTimeDisplay.set(f"{(self.rateTime.seconds% 3600)//60}:{self.rateTime.seconds%60} Until Exchange Rate Changes")
+
+    def start_timer(self):
+        threading.Thread(target=self.timer, daemon=True).start()
 
     def on_destroy(self, event):
         if event.widget == self:
@@ -847,19 +874,34 @@ class Coin(ttk.Frame):
 
         # Initializing Values
         self.coinAmount = tkinter.StringVar(value="1")
+        self.rate = tkinter.StringVar(
+            value=f"Current Exchange Rate: {backend.exchange_rate(self.coin)}"
+        )
 
         # Validation for Coin Entry
         vcmd = (self.controller.register(self.intValidate), "%S")
        
         # Populating Main Frame
+        # Current Excahnge Rate
+        self.exchR8_label = ttk.Label(
+            self, textvariable=self.rate, style="small.TLabel"
+        )
+        self.exchR8_label.grid(row=0, column=0, sticky="NSEW")
+
         # Log Out Button
         self.logOut_button = ttk.Button(
-            self,
-            text="Log Out",
-            style="small.TButton",
-            command=self.toplevel.destroy
+            self, text="Log Out", style="small.TButton", command=self.toplevel.destroy
         )
-        self.logOut_button.grid(row=0, column=2, sticky="NSEW")
+        self.logOut_button.grid(row=0, column=2, columnspan=2, sticky="NSEW")
+
+        # Time Until Exchange Rate Refresh
+        self.exchR8Time_label = ttk.Label(
+            self,
+            textvariable=toplevel.rateTimeDisplay,
+            style="small.TLabel",
+            anchor="e",
+        )
+        self.exchR8Time_label.grid(row=0, column=4, sticky="NSEW")
 
         # Coin Name Frame
         self.title_labelframe = ttk.LabelFrame(

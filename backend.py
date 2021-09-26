@@ -189,7 +189,7 @@ def sell_crypto(
         return False
 
 # for calculating time until next reset
-def refresh_time(currency):
+def refresh_time(currency ='botcoin'):
     cnx, cursor = make_connection()
     cursor.execute(f"SELECT dates FROM {currency} ORDER BY dates DESC LIMIT 1")
     result = cursor.fetchone()[0]
@@ -197,7 +197,6 @@ def refresh_time(currency):
     future = past + datetime.timedelta(minutes = 10)
     cnx.close()
     time_left = future - datetime.datetime.utcnow()
-    print(time_left)
     return time_left
 
 def main():

@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 pillow = "*"
 mysql-connector-python = "*"
+mttkinter = "*"
 
 [dev-packages]
 
