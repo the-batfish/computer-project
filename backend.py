@@ -231,6 +231,7 @@ def main():
                     2. esterium
                     3. binguscoin
                     4. floppacoin
+                    5. beans
                     enter your choice of cryptocurrency here: 
                     """
                         )
@@ -246,6 +247,9 @@ def main():
                         break
                     elif cryptochoice1 == 4:
                         crypto1 = "floppacoin"
+                        break
+                    elif cryptochoice1 == 5:
+                        crypto1 = "beans"
                         break
                     else:
                         print("Enter a valid option!")
@@ -264,6 +268,7 @@ def main():
                     2. esterium
                     3. binguscoin
                     4. floppacoin
+                    5. beans
                     enter your choice of cryptocurrency here: """
                         )
                     )
@@ -278,6 +283,9 @@ def main():
                         break
                     elif cryptochoice2 == 4:
                         crypto2 = "floppacoin"
+                        break
+                    elif cryptochoice1 == 5:
+                        crypto1 = "beans"
                         break
                     else:
                         print("Enter a valid option!")
