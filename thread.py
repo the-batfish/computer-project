@@ -70,10 +70,10 @@ def exch_r8_refresh(currency, cnx, cursor):
         ratio = 5.00
     if Decimal(curr_ratio) == Decimal(ratio):
         return curr_exch_r8, curr_ratio
-        
+
     elif round(curr_exch_r8 * ratio) <= 1:
         new_exch_r8 = 1
-    
+
     elif round(curr_exch_r8 * ratio) >= 9223372036854775807:
         new_exch_r8 = 9223372036854775807
 
@@ -86,7 +86,8 @@ def exch_r8_loop():
     while True:
         for i in currencies:
             cnx, cursor = make_connection()
-            cursor.execute(f"SELECT dates FROM {i} ORDER BY dates DESC LIMIT 1")
+            cursor.execute(
+                f"SELECT dates FROM {i} ORDER BY dates DESC LIMIT 1")
             results = cursor.fetchone()[0]
             dt = datetime.datetime.strptime(results, "%Y-%m-%d %H:%M:%S")
             print(i, dt)
@@ -108,4 +109,6 @@ def exch_r8_loop():
             else:
                 cnx.close()
                 sleep(1)
+
+
 exch_r8_loop()
